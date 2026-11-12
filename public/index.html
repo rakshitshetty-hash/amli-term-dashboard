@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMLI Term – November performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<script src="d3.min.js"></script>
+<style>
+:root{
+  --font-anthropic-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-anthropic-serif:'Source Serif 4',Georgia,serif;
+  --color-fg:#1f1e1b;--color-fg-muted:#6b6a65;--color-bg:#faf9f6;--color-panel:#ffffff;--color-border-line:#e6e3dc;
+  --color-ok:#2f7d4f;--color-warn:#b7791f;--color-bad:#c0392b;
+  --cds-font-size-caption:12px;--cds-font-size-body:14px;--cds-font-size-heading:17px;--cds-font-size-title:20px;
+  --cds-font-weight-medium:600;
+  --cds-gap-xs:4px;--cds-gap-sm:8px;--cds-gap-md:12px;--cds-gap-lg:18px;--cds-gap-xl:28px;
+  --cds-pad-xs:4px;--cds-pad-sm:8px;--cds-pad-md:12px;--cds-pad-lg:16px;--cds-pad-xl:24px;
+  --cds-radius:12px;
+  --cds-chart-grid:#eeebe4;--cds-chart-axis:#cfcac0;--cds-chart-reference:#a9a49a;--cds-text-secondary:#6b6a65;
+  --cds-surface-popover:#ffffff;--cds-border:#e6e3dc;--cds-shadow-popover:0 6px 20px rgba(0,0,0,.12);
+  --cds-dur-slow:500ms;--cds-ease-out:cubic-bezier(.2,.7,.2,1);
+  --am-accent:#2b5c8a;
+}
+@media (prefers-color-scheme:dark){:root{
+  --color-fg:#ecebe7;--color-fg-muted:#a3a19b;--color-bg:#161614;--color-panel:#1f1f1c;--color-border-line:#33322e;
+  --color-ok:#5cb37f;--color-warn:#e0a84a;--color-bad:#e8695c;
+  --cds-chart-grid:#2c2b28;--cds-chart-axis:#4a4943;--cds-chart-reference:#6d6b65;--cds-text-secondary:#a3a19b;
+  --cds-surface-popover:#262623;--cds-border:#3a3935;--am-accent:#7fb0dc;}}
+html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(--font-anthropic-sans);-webkit-text-size-adjust:100%}
+.am-shell{padding:16px 16px 40px}
+@media (min-width:760px){.am-shell{padding:28px 32px 56px}}
+.am-loading{font-size:14px;color:var(--color-fg-muted);padding:40px 0;text-align:center}
+.am-foot{margin-top:28px;font-size:12px;color:var(--color-fg-muted)}
+</style>
+</head>
+<body>
+<div class="am-shell">
+<div class="am-loading" id="am-loading">Loading the latest numbers…</div>
+<script>
+(function () {
+  const sources = {}, calcs = [], draws = {}, results = {};
+  const colors = ['var(--am-accent)', '#c46a2b', '#6b8e23', '#8e44ad'];
+  function get(id) {
+    if (id in results) return {status: 'ok', data: results[id], columns: results[id] && results[id][0] ? Object.keys(results[id][0]) : []};
+    return {status: window.__amError ? 'error' : 'loading', data: [], message: window.__amError || ''};
+  }
+  function runDraw(name) {
+    const d = draws[name]; if (!d) return;
+    document.querySelectorAll('[data-draw="' + name + '"]').forEach(function (el) {
+      if (el.closest('[hidden]')) return;
+      try {
+        if (typeof d === 'function') d(el);
+        else {
+          if (!el.__made) { el.replaceChildren(); el.__made = d.mount ? d.mount(el) : {}; }
+          d.update && d.update(el, el.__made);
+        }
+      } catch (e) { console.error('draw ' + name, e); }
+    });
+  }
+  function runAll() { Object.keys(draws).forEach(runDraw); }
+  window.dash = {
+    colors: colors,
+    data: get,
+    calc: function (id, o) { calcs.push(Object.assign({id: id}, o)); },
+    loader: function () {},
+    draw: function (name, fn) { if (fn) draws[name] = fn; else runDraw(name); },
+    onData: function (fn) { fn(); },
+    setLink: function (tab) { try { history.replaceState(null, '', '#' + tab); } catch (e) {} setTimeout(runAll, 0); },
+    params: function () { return {}; }, setParams: function () {}, resetParams: function () {}, refresh: function () {}
+  };
+  window.__amLoad = function (payload) {
+    Object.assign(results, payload);
+    calcs.forEach(function (c) {
+      try { results[c.id] = c.fn.apply(null, c.inputs.map(function (i) { return results[i]; })); }
+      catch (e) { console.error('calc ' + c.id, e); }
+    });
+    var l = document.getElementById('am-loading'); if (l) l.remove();
+    runAll();
+  };
+  var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(runAll, 150); });
+})();
+</script>
+<style>
+.am{font-family:var(--font-anthropic-sans);color:var(--color-fg);max-width:1100px;margin:0 auto;font-variant-numeric:tabular-nums}
+.am *{box-sizing:border-box}
+.am-head{padding:var(--cds-pad-sm) 0 var(--cds-pad-md)}
+.am-eyebrow{font-size:var(--cds-font-size-caption);letter-spacing:.08em;text-transform:uppercase;color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium)}
+.am-title{font-family:var(--font-anthropic-serif);font-weight:400;font-size:clamp(28px,6vw,40px);line-height:1.1;margin:6px 0 8px}
+.am-asof{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.am-tabs{position:sticky;top:0;z-index:5;display:flex;gap:4px;padding:6px 0;margin-bottom:var(--cds-gap-lg);background:var(--color-bg);border-bottom:1px solid var(--color-border-line);overflow-x:auto;scrollbar-width:none}
+.am-tabs::-webkit-scrollbar{display:none}
+.am-tab{font:inherit;font-size:var(--cds-font-size-body);border:0;background:transparent;color:var(--color-fg-muted);padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;font-weight:var(--cds-font-weight-medium)}
+.am-tab[aria-selected="true"]{background:var(--color-fg);color:var(--color-bg)}
+.am-lede{font-size:var(--cds-font-size-heading);line-height:1.45;margin:0 0 var(--cds-gap-lg);max-width:52ch}
+.am-lede b{font-weight:var(--cds-font-weight-medium)}
+.am-sec{margin-top:calc(var(--cds-gap-xl) * 1.2)}
+.am-h2{font-size:var(--cds-font-size-title);font-weight:var(--cds-font-weight-medium);margin:0}
+.am-sub{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:4px 0 var(--cds-gap-md);line-height:1.5}
+.am-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg)}
+.am-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--cds-gap-md)}
+@media (max-width:760px){.am-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.am-kpi{display:flex;flex-direction:column;gap:6px;min-width:0}
+.am-kpi-label{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium)}
+.am-kpi-val{font-family:var(--font-anthropic-serif);font-weight:400;font-size:clamp(24px,5.4vw,34px);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.am-kpi-meta{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);min-height:1.2em}
+.am-bar{position:relative;height:6px;border-radius:3px;background:var(--cds-chart-grid);margin-top:4px}
+.am-bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;width:0}
+.am-bar-tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--color-fg);opacity:.55;border-radius:1px}
+.am-pill{display:inline-block;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);padding:2px 8px;border-radius:999px;line-height:1.4}
+.am-ok{color:var(--color-ok)} .am-warn{color:var(--color-warn)} .am-bad{color:var(--color-bad)}
+.am-bg-ok{background:var(--color-ok)} .am-bg-warn{background:var(--color-warn)} .am-bg-bad{background:var(--color-bad)}
+.am-legend{display:flex;gap:var(--cds-gap-md);flex-wrap:wrap;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-bottom:var(--cds-gap-sm)}
+.am-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.am-groups{display:flex;flex-direction:column;padding-top:var(--cds-pad-sm);padding-bottom:var(--cds-pad-sm)}
+.am-grow{display:grid;grid-template-columns:minmax(100px,1.1fr) 3fr;gap:var(--cds-gap-md);align-items:center;padding:12px 0;border-bottom:1px solid var(--color-border-line)}
+.am-grow:last-child{border-bottom:0}
+.am-gname{font-weight:var(--cds-font-weight-medium)}
+.am-gcap{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:2px}
+.am-gbars{display:flex;flex-direction:column;gap:7px}
+.am-gline{display:grid;grid-template-columns:44px 1fr 48px;gap:8px;align-items:center;font-size:var(--cds-font-size-caption)}
+.am-gline .am-bar{margin:0}
+.am-gline span:first-child{color:var(--color-fg-muted)}
+.am-gpct{text-align:right;font-weight:var(--cds-font-weight-medium)}
+@media (max-width:520px){.am-grow{grid-template-columns:1fr}}
+.am-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:var(--cds-gap-md);scrollbar-width:none}
+.am-chips::-webkit-scrollbar{display:none}
+.am-chip{font:inherit;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.am-chip[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg)}
+.am-mx-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel)}
+.am-mx{border-collapse:separate;border-spacing:0;font-size:var(--cds-font-size-caption);min-width:100%}
+.am-mx th,.am-mx td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--color-border-line)}
+.am-mx thead th{color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium);position:sticky;top:0;background:var(--color-panel)}
+.am-mx .am-stick{position:sticky;left:0;z-index:2;text-align:left;background:var(--color-panel);border-right:1px solid var(--color-border-line);min-width:132px;font-weight:var(--cds-font-weight-medium)}
+.am-mx thead .am-stick{z-index:3}
+.am-mx .am-per{background:color-mix(in srgb,var(--color-fg) 4%,var(--color-panel))}
+.am-mx .am-per-first{border-left:2px solid var(--color-border-line)}
+.am-mx tr.am-grp-start td,.am-mx tr.am-grp-start th{border-top:2px solid var(--color-border-line)}
+.am-mx .am-tgt{color:var(--color-fg-muted)}
+.am-mx td.am-c-ok{color:var(--color-ok);font-weight:var(--cds-font-weight-medium)}
+.am-mx td.am-c-warn{color:var(--color-warn);font-weight:var(--cds-font-weight-medium)}
+.am-mx td.am-c-bad{color:var(--color-bad);font-weight:var(--cds-font-weight-medium)}
+.am-controls{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:center;margin-bottom:var(--cds-gap-md)}
+.am-seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:999px;padding:3px}
+.am-seg button{font:inherit;font-size:var(--cds-font-size-caption);border:0;background:transparent;color:var(--color-fg-muted);padding:5px 11px;border-radius:999px;cursor:pointer}
+.am-seg button[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg)}
+.am-chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--cds-gap-md);flex-wrap:wrap;margin-bottom:var(--cds-gap-sm)}
+.am-chart-title{font-weight:var(--cds-font-weight-medium)}
+.am-chart{position:relative;min-height:240px}
+.am-chart svg{display:block;overflow:visible}
+.am-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:8px;padding:6px 9px;font-size:var(--cds-font-size-caption);white-space:nowrap;opacity:0;transform:translate(-50%,-110%);z-index:4}
+.am-tip b{display:block;font-weight:var(--cds-font-weight-medium);color:var(--color-fg)}
+.am-tip span{color:var(--cds-text-secondary)}
+.am-cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:var(--cds-gap-md)}
+.am-cc{display:flex;flex-direction:column;gap:4px;padding:var(--cds-pad-md) var(--cds-pad-lg)}
+.am-cc-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.am-cc-name{font-weight:var(--cds-font-weight-medium)}
+.am-cc-big{font-family:var(--font-anthropic-serif);font-size:30px;line-height:1.1}
+.am-cc-cap{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.am-dir{font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.am-dir.up{color:var(--color-ok);background:color-mix(in srgb,var(--color-ok) 14%,transparent)}
+.am-dir.down{color:var(--color-bad);background:color-mix(in srgb,var(--color-bad) 14%,transparent)}
+.am-dir.flat{color:var(--color-fg-muted);background:color-mix(in srgb,var(--color-fg) 8%,transparent)}
+.am-cc.am-total{border-color:var(--color-fg)}
+.am-cc.am-low{opacity:.55}
+.am-spark{position:relative;height:56px;margin-top:6px}
+.am-spark svg{display:block;overflow:visible}
+.am-heat td.am-hc{font-weight:var(--cds-font-weight-medium)}
+.am-notes{margin-top:var(--cds-gap-xl);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.am-notes summary{cursor:pointer;font-weight:var(--cds-font-weight-medium);color:var(--color-fg)}
+.am-notes ul{padding-left:18px;line-height:1.6}
+.am-fail{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);padding:var(--cds-pad-md)}
+[data-dash-source-state=refreshing]{opacity:.5}
+@media (prefers-reduced-motion:no-preference){.am-bar-fill{transition:width var(--cds-dur-slow) var(--cds-ease-out)}}
+</style>
+
+<div class="am">
+  <header class="am-head" id="top">
+    <div class="am-eyebrow">Axis Max Life · Term · Direct &amp; D2C</div>
+    <h1 class="am-title">November performance</h1>
+    <div class="am-asof">Data through <span data-draw="asof" data-source="as_of">—</span> · Leads by creation date · Sales and APE by payment date</div>
+  </header>
+
+  <nav class="am-tabs" role="tablist" aria-label="Dashboard sections">
+    <button type="button" class="am-tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button type="button" class="am-tab" role="tab" data-tab="daily" aria-selected="false">Day on day</button>
+    <button type="button" class="am-tab" role="tab" data-tab="cream" aria-selected="false">Cream audience</button>
+  </nav>
+
+  <section id="overview" class="am-panel" role="tabpanel">
+    <p class="am-lede">Month-to-date APE is at <b data-draw="lede-ape" data-source="group_progress" data-field="ape_ach" data-where="group=Total">—</b> of target. <b data-draw="lede-lag" data-source="laggard" data-field="group" data-row="0">—</b> is furthest behind at <b data-draw="lede-lag-ape" data-source="laggard" data-field="ape_ach" data-row="0">—</b> of its APE target.</p>
+    <div class="am-kpis" id="kpis" aria-label="Month-to-date totals">
+      <div class="am-card am-kpi" id="kpi-ape">
+        <div class="am-kpi-label">APE · MTD</div>
+        <div class="am-kpi-val" data-draw="kpi-ape-val" data-source="targets_vs_actuals" data-field="ape_l_mtd" data-where="group=Total">—</div>
+        <div class="am-kpi-meta">Target <span data-draw="kpi-ape-tgt" data-source="targets_vs_actuals" data-field="ape_l_target_mtd" data-where="group=Total">—</span></div>
+        <div class="am-bar" data-draw="kpi-ape-bar" data-source="group_progress"></div>
+        <div><span class="am-pill" data-draw="kpi-ape-pct" data-source="group_progress" data-field="ape_ach" data-where="group=Total">—</span></div>
+      </div>
+      <div class="am-card am-kpi" id="kpi-sales">
+        <div class="am-kpi-label">Sales · MTD</div>
+        <div class="am-kpi-val" data-draw="kpi-sales-val" data-source="targets_vs_actuals" data-field="sales_mtd" data-where="group=Total">—</div>
+        <div class="am-kpi-meta">Target <span data-draw="kpi-sales-tgt" data-source="targets_vs_actuals" data-field="sales_target_mtd" data-where="group=Total">—</span></div>
+        <div class="am-bar" data-draw="kpi-sales-bar" data-source="group_progress"></div>
+        <div><span class="am-pill" data-draw="kpi-sales-pct" data-source="group_progress" data-field="sales_ach" data-where="group=Total">—</span></div>
+      </div>
+      <div class="am-card am-kpi" id="kpi-leads">
+        <div class="am-kpi-label">Leads · MTD</div>
+        <div class="am-kpi-val" data-draw="kpi-leads-val" data-source="targets_vs_actuals" data-field="leads_mtd" data-where="group=Total">—</div>
+        <div class="am-kpi-meta">Target <span data-draw="kpi-leads-tgt" data-source="targets_vs_actuals" data-field="leads_target_mtd" data-where="group=Total">—</span></div>
+        <div class="am-bar" data-draw="kpi-leads-bar" data-source="group_progress"></div>
+        <div><span class="am-pill" data-draw="kpi-leads-pct" data-source="group_progress" data-field="leads_ach" data-where="group=Total">—</span></div>
+      </div>
+      <div class="am-card am-kpi" id="kpi-cvr">
+        <div class="am-kpi-label">CVR · Sales ÷ Leads</div>
+        <div class="am-kpi-val" data-draw="kpi-cvr-val" data-source="group_progress" data-field="cvr" data-where="group=Total">—</div>
+        <div class="am-kpi-meta">Plan <span data-draw="kpi-cvr-tgt" data-source="group_progress" data-field="cvr_target" data-where="group=Total">—</span></div>
+        <div class="am-bar" data-draw="kpi-cvr-bar" data-source="group_progress"></div>
+        <div><span class="am-pill" data-draw="kpi-cvr-pct" data-source="group_progress" data-field="cvr_vs_plan" data-where="group=Total">—</span></div>
+      </div>
+    </div>
+
+    <div class="am-sec" id="groups">
+      <h2 class="am-h2">Achievement by group</h2>
+      <p class="am-sub">Month-to-date actual as % of month-to-date target. The marker is 100%.</p>
+      <div class="am-legend"><span><i class="am-bg-ok"></i>On or above target</span><span><i class="am-bg-warn"></i>90–99%</span><span><i class="am-bg-bad"></i>Below 90%</span></div>
+      <div class="am-card am-groups" data-draw="group-list" data-source="group_progress targets_vs_actuals"></div>
+    </div>
+
+    <details class="am-notes" id="notes">
+      <summary>How these numbers are built</summary>
+      <ul>
+        <li>Leads come from the unique lead dump, dated by lead creation date. Sales and APE come from the Direct &amp; D2C sales dump, dated by payment date. Spend comes from the Daily Spends Tracker (Term All Channels).</li>
+        <li>Line items follow the Master Tracker mapping. NewBlank7 sits in Brand. Bottom Funnel = Brand + Core + Others. Display = PR + RM. On this tab, Netcore includes the cross-sell and upsell journeys, as in the plan; the Day on day tab shows the Netcore line item alone, against its own plan rows.</li>
+        <li>Targets are the Nov'26 media plan. Month-to-date and daily targets follow the plan's daily phasing (QL curve for leads, NOP and APE curves for sales and APE), not a straight split by days.</li>
+        <li>Total sales and APE targets use the plan's unique-sale figures (8,688 sales, ₹25.49 Cr APE). Group targets add up to more because some sales count in more than one group.</li>
+        <li>CVR divides sales by payment date by leads by creation date, so the latest days read low until those leads pay.</li>
+        <li>"Furthest behind" looks only at groups with a month APE target of ₹100 L or more.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="daily" class="am-panel" role="tabpanel" hidden>
+    <h2 class="am-h2">Day on day</h2>
+    <p class="am-sub">Pick a line item. Swipe the table sideways for earlier days; week and month totals sit at the right. Achieved % compares each day with that day's plan target. CPL = Spend ÷ Leads · CVR = Sales ÷ Leads · COA = Spend ÷ APE.</p>
+    <div class="am-chips" role="group" aria-label="Line item" id="am-items">
+      <button type="button" class="am-chip" data-item="All channels" aria-pressed="true">All channels</button>
+      <button type="button" class="am-chip" data-item="SEO" aria-pressed="false">SEO</button>
+      <button type="button" class="am-chip" data-item="Brand" aria-pressed="false">Brand</button>
+      <button type="button" class="am-chip" data-item="Core" aria-pressed="false">Core</button>
+      <button type="button" class="am-chip" data-item="Others" aria-pressed="false">Others</button>
+      <button type="button" class="am-chip" data-item="PR" aria-pressed="false">PR</button>
+      <button type="button" class="am-chip" data-item="RM" aria-pressed="false">RM</button>
+      <button type="button" class="am-chip" data-item="New Affiliate" aria-pressed="false">New Affiliate</button>
+      <button type="button" class="am-chip" data-item="Amazon" aria-pressed="false">Amazon</button>
+      <button type="button" class="am-chip" data-item="Netcore" aria-pressed="false">Netcore</button>
+    </div>
+    <div class="am-legend"><span><i class="am-bg-ok"></i>Achieved ≥ 100%</span><span><i class="am-bg-warn"></i>90–99%</span><span><i class="am-bg-bad"></i>Below 90%</span></div>
+    <div class="am-mx-wrap" id="dod-matrix" data-draw="dod-matrix" data-source="dod_matrix"></div>
+
+    <div class="am-sec" id="trend">
+      <h2 class="am-h2">Trend</h2>
+      <p class="am-sub">The same line item, one metric at a time. Tap a bar for that day's numbers.</p>
+      <div class="am-controls">
+        <div class="am-seg" role="group" aria-label="Metric" id="am-metric">
+          <button type="button" data-metric="cvr" aria-pressed="true">CVR</button>
+          <button type="button" data-metric="leads_ach" aria-pressed="false">Leads ach.</button>
+          <button type="button" data-metric="ape_ach" aria-pressed="false">APE ach.</button>
+          <button type="button" data-metric="cpl" aria-pressed="false">CPL</button>
+          <button type="button" data-metric="coa" aria-pressed="false">COA</button>
+          <button type="button" data-metric="leads" aria-pressed="false">Leads</button>
+          <button type="button" data-metric="ape" aria-pressed="false">APE</button>
+          <button type="button" data-metric="spend" aria-pressed="false">Spend</button>
+        </div>
+      </div>
+      <div class="am-card">
+        <div class="am-chart-head"><div class="am-chart-title" data-draw="dod-title">—</div></div>
+        <div class="am-chart" data-draw="dod-chart" data-source="dod_matrix"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cream" class="am-panel" role="tabpanel" hidden>
+    <h2 class="am-h2">Cream audience</h2>
+    <p class="am-sub">Cream = leads with 10L+ income, salaried and graduate &amp; above. Each card compares this week's cream share of leads with last week's. Up is good: more of the leads are the best-converting kind.</p>
+    <p class="am-lede" id="cream-lede">Across all channels, cream is <b data-draw="cream-cur" data-source="cream_period" data-field="cur" data-where="line_item=All channels">—</b> of leads this week against <b data-draw="cream-prev" data-source="cream_period" data-field="prev" data-where="line_item=All channels">—</b> last week: <b data-draw="cream-dir" data-source="cream_period" data-field="change" data-where="line_item=All channels">—</b>.</p>
+    <div class="am-legend"><span><i class="am-bg-ok"></i>Up 0.5 pp or more</span><span><i class="am-bg-bad"></i>Down 0.5 pp or more</span><span><i style="background:var(--color-fg-muted)"></i>Steady</span></div>
+    <div class="am-cgrid" data-draw="cream-cards" data-source="cream_period cream_share"></div>
+
+    <div class="am-sec" id="cream-daily">
+      <h2 class="am-h2">Cream share by day</h2>
+      <p class="am-sub">Each cell is that day's cream share. Green is above the line item's previous-week average, red below it.</p>
+      <div class="am-mx-wrap" data-draw="cream-heat" data-source="cream_share cream_period"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+window.amFmt = (function () {
+  const inr = new Intl.NumberFormat('en-IN', {maximumFractionDigits: 0});
+  const inr1 = new Intl.NumberFormat('en-IN', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+  const ok = (v) => v != null && !isNaN(v);
+  const num = (v) => (ok(v) ? inr.format(v) : '—');
+  const lakh = (v) => (ok(v) ? '₹' + inr1.format(v) + ' L' : '—');
+  const pct = (v, d) => (ok(v) ? (v * 100).toFixed(d == null ? 0 : d) + '%' : '—');
+  const rupee = (v) => (ok(v) ? '₹' + inr.format(v) : '—');
+  const rL = (v) => (ok(v) ? '₹' + inr1.format(v / 1e5) + 'L' : '—');
+  const status = (v) => (!ok(v) ? '' : v >= 1 ? 'ok' : v >= 0.9 ? 'warn' : 'bad');
+  const metric = {
+    cvr: {label: 'CVR', fmt: (v) => pct(v, 2), axis: (v) => pct(v, 1)},
+    leads_ach: {label: 'Leads achieved vs daily target', fmt: (v) => pct(v), axis: (v) => pct(v), ref: 1},
+    ape_ach: {label: 'APE achieved vs daily target', fmt: (v) => pct(v), axis: (v) => pct(v), ref: 1},
+    cpl: {label: 'CPL', fmt: rupee, axis: rupee},
+    coa: {label: 'COA', fmt: (v) => pct(v, 0), axis: (v) => pct(v, 0)},
+    leads: {label: 'Leads', fmt: num, axis: num},
+    ape: {label: 'APE', fmt: rL, axis: (v) => '₹' + inr.format(v / 1e5) + 'L'},
+    spend: {label: 'Spend', fmt: rL, axis: (v) => '₹' + inr.format(v / 1e5) + 'L'}
+  };
+  const enc = (s) => String(s).replace(/%/g, '%25').replace(/&/g, '%26').replace(/=/g, '%3D').replace(/,/g, '%2C');
+  return {num, lakh, pct, rupee, rL, status, metric, enc, ok};
+})();
+window.amState = {item: 'All channels', metric: 'cvr', tab: 'overview'};
+</script>
+
+<script>
+const sum = (rows, k) => rows.reduce((a, r) => a + (+r[k] || 0), 0);
+const dayOf = (r) => +String(r.date).slice(8, 10);
+
+dash.calc('group_progress', {
+  title: 'Achievement vs target by group',
+  description: 'Month-to-date actual ÷ month-to-date target for leads, sales and APE, plus CVR against the plan CVR (month sales target ÷ month leads target).',
+  inputs: ['targets_vs_actuals'],
+  fn: (targets) => targets.map((t) => {
+    const leads = +t.leads_mtd, sales = +t.sales_mtd, ape = +t.ape_l_mtd;
+    const cvr = leads ? sales / leads : null;
+    const cvr_target = +t.leads_target_month ? +t.sales_target_month / +t.leads_target_month : null;
+    return {
+      group: t.group, order: +t.order,
+      leads_ach: +t.leads_target_mtd ? leads / +t.leads_target_mtd : null,
+      sales_ach: +t.sales_target_mtd ? sales / +t.sales_target_mtd : null,
+      ape_ach: +t.ape_l_target_mtd ? ape / +t.ape_l_target_mtd : null,
+      cvr, cvr_target,
+      cvr_vs_plan: cvr != null && cvr_target ? cvr / cvr_target : null,
+      ape_target_month: +t.ape_l_target_month
+    };
+  })
+});
+
+dash.calc('laggard', {
+  title: 'Group furthest behind on APE',
+  description: 'The group with the lowest APE achievement among groups with a month APE target of ₹100 L or more.',
+  inputs: ['group_progress'],
+  fn: (progress) => {
+    const pool = (progress || []).filter((g) => g.group !== 'Total' && g.ape_target_month >= 100 && g.ape_ach != null);
+    if (!pool.length) return [];
+    const worst = pool.reduce((a, b) => (b.ape_ach < a.ape_ach ? b : a));
+    return [{group: worst.group, ape_ach: worst.ape_ach}];
+  }
+});
+
+dash.calc('as_of', {
+  title: 'Latest day in the data',
+  description: 'The most recent date in the daily performance file.',
+  inputs: ['daily_performance'],
+  fn: (daily) => daily.reduce((m, r) => (r.date > m ? r.date : m), '')
+});
+
+dash.calc('dod_matrix', {
+  title: 'Day-on-day metrics with targets',
+  description: 'For each line item, each day and each week (W1 = 1–7, W2 = 8–14, W3 = 15–21, W4 = 22–30) and month to date: spend, leads, sales, APE, the plan targets for the same days, achieved % (actual ÷ target), CPL (spend ÷ leads), CVR (sales ÷ leads) and COA (spend ÷ APE). Week and month targets add up only the days that have data.',
+  inputs: ['daily_performance', 'daily_targets'],
+  fn: (daily, targets) => {
+    const tKey = (r) => r.line_item + '|' + r.date;
+    const tMap = new Map(targets.map((t) => [tKey(t), t]));
+    const build = (item, col, rows) => {
+      const spend = sum(rows, 'spend'), leads = sum(rows, 'leads'), sales = sum(rows, 'sales'), ape = sum(rows, 'ape');
+      const ts = rows.map((r) => tMap.get(tKey(r)) || {});
+      const target_leads = sum(ts, 'target_leads'), target_sales = sum(ts, 'target_sales'), target_ape = sum(ts, 'target_ape');
+      return {line_item: item, col, days: rows.length, spend, leads, target_leads, leads_ach: target_leads ? leads / target_leads : null,
+        cpl: leads && spend ? spend / leads : null, sales, target_sales, sales_ach: target_sales ? sales / target_sales : null,
+        cvr: leads ? sales / leads : null, ape, target_ape, ape_ach: target_ape ? ape / target_ape : null,
+        coa: ape && spend ? spend / ape : null};
+    };
+    const out = [];
+    const items = Array.from(new Set(daily.map((r) => r.line_item)));
+    for (const item of items) {
+      const mine = daily.filter((r) => r.line_item === item).sort((a, b) => (a.date < b.date ? -1 : 1));
+      for (const r of mine) out.push(build(item, r.date, [r]));
+      for (const [col, a, b] of [['W1', 1, 7], ['W2', 8, 14], ['W3', 15, 21], ['W4', 22, 30], ['MTD', 1, 31]]) {
+        const rows = mine.filter((r) => dayOf(r) >= a && dayOf(r) <= b);
+        if (rows.length) out.push(build(item, col, rows));
+      }
+    }
+    return out;
+  }
+});
+
+dash.calc('cream_share', {
+  title: 'Daily cream share of leads',
+  description: 'Each day and line item: cream leads ÷ all leads.',
+  inputs: ['cream_leads'],
+  fn: (cream) => cream.map((r) => ({date: r.date, line_item: r.line_item, leads: +r.leads, cream_leads: +r.cream_leads,
+    share: +r.leads ? +r.cream_leads / +r.leads : null}))
+});
+
+dash.calc('cream_period', {
+  title: 'Cream share: this week vs last week',
+  description: 'Cream leads ÷ all leads for the latest week with data (cur) and the week before (prev), the change in percentage points, and month to date. Weeks are 1–7, 8–14, 15–21, 22–30.',
+  inputs: ['cream_leads'],
+  fn: (cream) => {
+    const wk = (d) => (d <= 7 ? 1 : d <= 14 ? 2 : d <= 21 ? 3 : 4);
+    const last = cream.reduce((m, r) => Math.max(m, dayOf(r)), 0);
+    const curW = wk(last), prevW = curW - 1;
+    const share = (rows) => { const l = sum(rows, 'leads'); return l ? sum(rows, 'cream_leads') / l : null; };
+    const items = Array.from(new Set(cream.map((r) => r.line_item)));
+    return items.map((item) => {
+      const rows = cream.filter((r) => r.line_item === item);
+      const cur = share(rows.filter((r) => wk(dayOf(r)) === curW));
+      const prev = prevW >= 1 ? share(rows.filter((r) => wk(dayOf(r)) === prevW)) : null;
+      return {line_item: item, cur_week: 'W' + curW, prev_week: prevW >= 1 ? 'W' + prevW : null, cur, prev,
+        change: cur != null && prev != null ? cur - prev : null, mtd: share(rows), mtd_leads: sum(rows, 'leads')};
+    });
+  }
+});
+</script>
+
+<script>
+(function () {
+  const show = (tab) => {
+    if (!['overview', 'daily', 'cream'].includes(tab)) tab = 'overview';
+    window.amState.tab = tab;
+    document.querySelectorAll('.am-panel').forEach((p) => { p.hidden = p.id !== tab; });
+    document.querySelectorAll('.am-tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+    dash.setLink(tab);
+  };
+  document.querySelectorAll('.am-tab').forEach((b) => b.addEventListener('click', () => {
+    show(b.dataset.tab);
+    const top = document.querySelector('.am-tabs');
+    if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({block: 'start'});
+  }));
+  const h = (location.hash || '').replace('#', '');
+  if (['daily', 'cream', 'overview'].includes(h)) show(h);
+})();
+</script>
+
+<script>
+(function () {
+  const F = window.amFmt;
+  const row = (id, group) => { const d = dash.data(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data.find((r) => r.group === group) : null; };
+  const text = (name, fn) => dash.draw(name, (el) => { const v = fn(); el.textContent = v == null ? '—' : v; });
+
+  text('asof', () => { const d = dash.data('as_of'); if (d.status !== 'ok' || !d.data) return null; return d3.utcFormat('%-d %b %Y')(d3.utcParse('%Y-%m-%d')(d.data)); });
+  text('lede-ape', () => { const r = row('group_progress', 'Total'); return r ? F.pct(r.ape_ach) : null; });
+  text('lede-lag', () => { const d = dash.data('laggard'); return d.status === 'ok' && d.data && d.data[0] ? d.data[0].group : null; });
+  text('lede-lag-ape', () => { const d = dash.data('laggard'); return d.status === 'ok' && d.data && d.data[0] ? F.pct(d.data[0].ape_ach) : null; });
+
+  const pill = (el, v, suffix) => {
+    el.className = 'am-pill';
+    el.style.background = '';
+    if (v == null) { el.textContent = '—'; return; }
+    const s = F.status(v);
+    el.textContent = F.pct(v) + suffix;
+    el.classList.add('am-' + s);
+    el.style.background = 'color-mix(in srgb, var(--color-' + s + ') 14%, transparent)';
+  };
+  const bar = (el, v) => {
+    el.replaceChildren();
+    const fill = document.createElement('div'); fill.className = 'am-bar-fill';
+    const tick = document.createElement('div'); tick.className = 'am-bar-tick'; tick.style.left = (100 / 1.5) + '%';
+    el.append(fill, tick);
+    if (v == null) return;
+    fill.classList.add('am-bg-' + F.status(v));
+    requestAnimationFrame(() => { fill.style.width = Math.min(v / 1.5, 1) * 100 + '%'; });
+  };
+  const kpi = (key, valFn, tgtFn, achField) => {
+    text('kpi-' + key + '-val', () => { const r = row('targets_vs_actuals', 'Total'); return r ? valFn(r) : null; });
+    text('kpi-' + key + '-tgt', () => { const r = row('targets_vs_actuals', 'Total'); return r ? tgtFn(r) : null; });
+    dash.draw('kpi-' + key + '-pct', (el) => { const r = row('group_progress', 'Total'); pill(el, r ? r[achField] : null, ' of target'); });
+    dash.draw('kpi-' + key + '-bar', (el) => { const r = row('group_progress', 'Total'); bar(el, r ? r[achField] : null); });
+  };
+  kpi('ape', (r) => F.lakh(+r.ape_l_mtd), (r) => F.lakh(+r.ape_l_target_mtd), 'ape_ach');
+  kpi('sales', (r) => F.num(+r.sales_mtd), (r) => F.num(+r.sales_target_mtd), 'sales_ach');
+  kpi('leads', (r) => F.num(+r.leads_mtd), (r) => F.num(+r.leads_target_mtd), 'leads_ach');
+  text('kpi-cvr-val', () => { const r = row('group_progress', 'Total'); return r ? F.pct(r.cvr, 2) : null; });
+  text('kpi-cvr-tgt', () => { const r = row('group_progress', 'Total'); return r ? F.pct(r.cvr_target, 2) : null; });
+  dash.draw('kpi-cvr-pct', (el) => { const r = row('group_progress', 'Total'); pill(el, r ? r.cvr_vs_plan : null, ' of plan'); });
+  dash.draw('kpi-cvr-bar', (el) => { const r = row('group_progress', 'Total'); bar(el, r ? r.cvr_vs_plan : null); });
+
+  dash.draw('group-list', (el) => {
+    const p = dash.data('group_progress'), t = dash.data('targets_vs_actuals');
+    if (p.status === 'error' || t.status === 'error') { el.replaceChildren(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: 'Failed to load'})); return; }
+    if (p.status !== 'ok' || t.status !== 'ok' || !p.data) { el.textContent = '—'; return; }
+    const groups = p.data.filter((g) => g.group !== 'Total').sort((a, b) => a.order - b.order);
+    el.replaceChildren(...groups.map((g) => {
+      const tr = t.data.find((x) => x.group === g.group) || {};
+      const where = 'group=' + F.enc(g.group);
+      const rowEl = document.createElement('div'); rowEl.className = 'am-grow'; rowEl.id = 'grp-' + g.group.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+      const head = document.createElement('div');
+      const name = document.createElement('div'); name.className = 'am-gname'; name.textContent = g.group;
+      const cap = document.createElement('div'); cap.className = 'am-gcap';
+      const capApe = document.createElement('span'); capApe.textContent = F.lakh(+tr.ape_l_mtd);
+      Object.assign(capApe.dataset, {source: 'targets_vs_actuals', field: 'ape_l_mtd', where});
+      const capTgt = document.createElement('span'); capTgt.textContent = F.lakh(+tr.ape_l_target_mtd);
+      Object.assign(capTgt.dataset, {source: 'targets_vs_actuals', field: 'ape_l_target_mtd', where});
+      cap.append('APE ', capApe, ' of ', capTgt);
+      head.append(name, cap);
+      const bars = document.createElement('div'); bars.className = 'am-gbars';
+      for (const [label, field] of [['Leads', 'leads_ach'], ['Sales', 'sales_ach'], ['APE', 'ape_ach']]) {
+        const v = g[field];
+        const line = document.createElement('div'); line.className = 'am-gline';
+        const lab = document.createElement('span'); lab.textContent = label;
+        const b = document.createElement('div'); b.className = 'am-bar';
+        bar(b, v);
+        const pv = document.createElement('span'); pv.className = 'am-gpct';
+        Object.assign(pv.dataset, {source: 'group_progress', field, where});
+        pv.textContent = F.pct(v);
+        if (v != null) pv.classList.add('am-' + F.status(v));
+        line.append(lab, b, pv); bars.append(line);
+      }
+      rowEl.append(head, bars);
+      return rowEl;
+    }));
+  });
+})();
+</script>
+
+<script>
+(function () {
+  const F = window.amFmt;
+  const redraw = () => { dash.draw('dod-matrix'); dash.draw('dod-title'); dash.draw('dod-chart'); };
+  document.querySelectorAll('#am-items .am-chip').forEach((btn) => btn.addEventListener('click', () => {
+    window.amState.item = btn.dataset.item;
+    document.querySelectorAll('#am-items .am-chip').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    redraw();
+  }));
+  document.querySelectorAll('#am-metric button').forEach((btn) => btn.addEventListener('click', () => {
+    window.amState.metric = btn.dataset.metric;
+    document.querySelectorAll('#am-metric button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    redraw();
+  }));
+
+  const ROWS = [
+    ['spend', 'Spend', F.rL, 'g'], ['leads', 'Leads', F.num], ['target_leads', 'Target leads', F.num, 't'], ['leads_ach', 'Leads achieved', (v) => F.pct(v), 'a'],
+    ['cpl', 'CPL', F.rupee],
+    ['sales', 'Sales', F.num, 'g'], ['target_sales', 'Target sales', F.num, 't'], ['sales_ach', 'Sales achieved', (v) => F.pct(v), 'a'], ['cvr', 'CVR', (v) => F.pct(v, 2)],
+    ['ape', 'APE', F.rL, 'g'], ['target_ape', 'Target APE', F.rL, 't'], ['ape_ach', 'APE achieved', (v) => F.pct(v), 'a'], ['coa', 'COA', (v) => F.pct(v, 0)]
+  ];
+
+  dash.draw('dod-matrix', (el) => {
+    const d = dash.data('dod_matrix');
+    if (d.status === 'error') { el.replaceChildren(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: 'Failed to load'})); return; }
+    if (d.status !== 'ok' || !d.data) { el.textContent = '—'; return; }
+    const item = window.amState.item;
+    const mine = d.data.filter((r) => r.line_item === item);
+    const days = mine.filter((r) => /^\d{4}-/.test(r.col));
+    const pers = ['W1', 'W2', 'W3', 'W4', 'MTD'].map((p) => mine.find((r) => r.col === p)).filter(Boolean);
+    const cols = days.concat(pers);
+    const fmtDay = d3.utcFormat('%-d %b'), parse = d3.utcParse('%Y-%m-%d');
+    const table = document.createElement('table'); table.className = 'am-mx'; table.id = 'dod-table';
+    table.setAttribute('aria-label', item + ' day-on-day metrics');
+    const thead = document.createElement('thead'); const hr = document.createElement('tr');
+    const h0 = document.createElement('th'); h0.className = 'am-stick'; h0.textContent = item; hr.append(h0);
+    cols.forEach((c, i) => {
+      const th = document.createElement('th');
+      const isPer = !/^\d{4}-/.test(c.col);
+      th.textContent = isPer ? (c.col === 'MTD' ? 'MTD' : c.col + (c.days < 7 && c.col !== 'MTD' ? ' (' + c.days + 'd)' : '')) : fmtDay(parse(c.col));
+      if (isPer) { th.classList.add('am-per'); if (c.col === 'W1') th.classList.add('am-per-first'); }
+      hr.append(th);
+    });
+    thead.append(hr); table.append(thead);
+    const tb = document.createElement('tbody');
+    ROWS.forEach(([field, label, fmt, kind], ri) => {
+      const tr = document.createElement('tr');
+      if (kind === 'g' && ri > 0) tr.className = 'am-grp-start';
+      const th = document.createElement('th'); th.className = 'am-stick'; th.scope = 'row'; th.textContent = label;
+      if (kind === 't') th.classList.add('am-tgt');
+      tr.append(th);
+      cols.forEach((c) => {
+        const td = document.createElement('td');
+        const v = c[field];
+        td.textContent = fmt(v);
+        Object.assign(td.dataset, {source: 'dod_matrix', field, where: 'line_item=' + F.enc(item) + '&col=' + F.enc(c.col)});
+        if (!/^\d{4}-/.test(c.col)) { td.classList.add('am-per'); if (c.col === 'W1') td.classList.add('am-per-first'); }
+        if (kind === 't') td.classList.add('am-tgt');
+        if (kind === 'a' && v != null) td.classList.add('am-c-' + F.status(v));
+        tr.append(td);
+      });
+      tb.append(tr);
+    });
+    table.append(tb);
+    el.replaceChildren(table);
+    requestAnimationFrame(() => { el.scrollLeft = el.scrollWidth; });
+  });
+
+  dash.draw('dod-title', (el) => { el.textContent = window.amState.item + ' · ' + F.metric[window.amState.metric].label; });
+
+  dash.draw('dod-chart', {
+    mount: (el) => {
+      el.replaceChildren();
+      const svg = d3.select(el).append('svg').attr('role', 'img');
+      const tip = document.createElement('div'); tip.className = 'am-tip';
+      el.append(tip);
+      return {svg, tip, played: false};
+    },
+    update: (el, made) => {
+      const d = dash.data('dod_matrix');
+      const {svg, tip} = made;
+      svg.selectAll('*').remove();
+      tip.style.opacity = 0;
+      el.querySelectorAll('.am-fail').forEach((n) => n.remove());
+      if (d.status === 'error') { el.append(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: 'Failed to load'})); return; }
+      if (d.status !== 'ok' || !d.data) return;
+      const m = window.amState.metric, M = F.metric[m];
+      const parse = d3.utcParse('%Y-%m-%d');
+      const rows = d.data.filter((r) => r.line_item === window.amState.item && /^\d{4}-/.test(r.col))
+        .map((r) => ({...r, t: parse(r.col), v: r[m]})).sort((a, b) => a.t - b.t);
+      const W = Math.max(el.clientWidth, 280), H = W < 480 ? 220 : 260;
+      svg.attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('aria-label', `${window.amState.item} ${M.label} by day`);
+      const vals = rows.map((r) => r.v).filter((v) => v != null);
+      const yMax = Math.max(vals.length ? d3.max(vals) * 1.15 : 1, M.ref ? M.ref * 1.1 : 0);
+      const y = d3.scaleLinear().domain([0, yMax || 1]).nice(4);
+      const ticks = y.ticks(4);
+      const probe = svg.append('g');
+      let ml = 0;
+      ticks.forEach((tv) => { const tx = probe.append('text').style('font-size', 'var(--cds-font-size-caption)').text(M.axis(tv)); ml = Math.max(ml, tx.node().getComputedTextLength()); });
+      probe.remove();
+      const margin = {top: 20, right: 8, bottom: 26, left: Math.ceil(ml) + 10};
+      const iw = W - margin.left - margin.right, ih = H - margin.top - margin.bottom;
+      y.range([ih, 0]);
+      const start = Date.UTC(2026, 10, 1), lastT = rows.length ? +rows[rows.length - 1].t : start;
+      const days = d3.utcDays(new Date(start), new Date(Math.max(lastT, start) + 864e5));
+      const x = d3.scaleBand().domain(days.map((t) => +t)).range([0, iw]).padding(0.28);
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+      const cap = (sel) => sel.style('fill', 'var(--cds-text-secondary)').style('font-size', 'var(--cds-font-size-caption)');
+      g.append('g').selectAll('line').data(ticks).join('line').attr('x1', 0).attr('x2', iw).attr('y1', (tv) => y(tv)).attr('y2', (tv) => y(tv)).style('stroke', 'var(--cds-chart-grid)');
+      cap(g.append('g').selectAll('text').data(ticks).join('text').attr('x', -8).attr('y', (tv) => y(tv)).attr('dy', '0.32em').attr('text-anchor', 'end').text((tv) => M.axis(tv)));
+      [8, 15, 22].forEach((dd) => {
+        const t = Date.UTC(2026, 10, dd);
+        if (x(t) == null) return;
+        const xx = x(t) - x.step() * x.padding() / 2 - 1;
+        g.append('line').attr('x1', xx).attr('x2', xx).attr('y1', 0).attr('y2', ih).style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '2 3');
+        cap(g.append('text').attr('x', xx + 4).attr('y', -7).text('W' + ((dd - 1) / 7 + 1)));
+      });
+      cap(g.append('text').attr('x', 0).attr('y', -7).text('W1'));
+      const step = Math.max(1, Math.ceil(days.length / Math.max(2, Math.floor(iw / 44))));
+      cap(g.append('g').selectAll('text').data(days.filter((_, i) => i % step === 0)).join('text')
+        .attr('x', (t) => x(+t) + x.bandwidth() / 2).attr('y', ih + 18).attr('text-anchor', 'middle').text((t) => d3.utcFormat('%-d')(t)));
+      g.append('line').attr('x1', 0).attr('x2', iw).attr('y1', ih).attr('y2', ih).style('stroke', 'var(--cds-chart-axis)');
+      const good = rows.filter((r) => r.v != null);
+      const reduce = !window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const colorOf = (r) => (M.ref ? 'var(--color-' + F.status(r.v) + ')' : dash.colors[0]);
+      const bars = g.append('g').selectAll('rect').data(good).join('rect')
+        .attr('x', (r) => x(+r.t)).attr('width', x.bandwidth()).attr('rx', Math.min(4, x.bandwidth() / 3)).style('fill', colorOf);
+      if (!made.played && !reduce) {
+        bars.attr('y', ih).attr('height', 0).transition().duration(600).ease(d3.easeCubicOut).attr('y', (r) => y(r.v)).attr('height', (r) => ih - y(r.v));
+        made.played = true;
+      } else bars.attr('y', (r) => y(r.v)).attr('height', (r) => ih - y(r.v));
+      if (M.ref) {
+        g.append('line').attr('x1', 0).attr('x2', iw).attr('y1', y(M.ref)).attr('y2', y(M.ref)).style('stroke', 'var(--color-fg)').style('stroke-dasharray', '4 3').style('opacity', 0.6);
+        cap(g.append('text').attr('x', iw).attr('y', y(M.ref) - 5).attr('text-anchor', 'end').text('Target 100%'));
+      }
+      const last = good.slice(-1)[0];
+      if (last) g.append('text').attr('x', x(+last.t) + x.bandwidth() / 2).attr('y', y(last.v) - 6).attr('text-anchor', 'middle')
+        .text(M.fmt(last.v)).style('fill', 'var(--color-fg)').style('font-size', 'var(--cds-font-size-caption)').style('font-weight', '500');
+      const showTip = (event, r) => {
+        tip.replaceChildren();
+        const b = document.createElement('b'); b.textContent = M.fmt(r.v);
+        const s = document.createElement('span'); s.textContent = d3.utcFormat('%a %-d %b')(r.t) + ' · ' + F.num(r.leads) + ' leads · ' + F.num(r.sales) + ' sales';
+        tip.append(b, s);
+        const cx = margin.left + x(+r.t) + x.bandwidth() / 2;
+        tip.style.left = Math.min(Math.max(cx, 100), W - 100) + 'px';
+        tip.style.top = (margin.top + y(r.v)) + 'px';
+        tip.style.opacity = 1;
+      };
+      g.append('g').selectAll('rect').data(good).join('rect')
+        .attr('x', (r) => x(+r.t) - x.step() * x.padding() / 2).attr('width', x.step()).attr('y', 0).attr('height', ih)
+        .style('fill', 'transparent').style('cursor', 'pointer')
+        .on('pointerenter', showTip).on('pointerdown', showTip).on('pointerleave', () => { tip.style.opacity = 0; });
+    }
+  });
+})();
+</script>
+
+<script>
+(function () {
+  const F = window.amFmt;
+  const ORDER = ['All channels', 'SEO', 'Brand', 'Core', 'Others', 'PR', 'RM', 'New Affiliate', 'Amazon', 'Netcore'];
+  const DEAD = 0.005;
+  const dirOf = (ch) => (ch == null ? 'flat' : ch >= DEAD ? 'up' : ch <= -DEAD ? 'down' : 'flat');
+  const ppText = (ch) => { if (ch == null) return '—'; const pp = ch * 100; return (pp > 0 ? '+' : pp < 0 ? '−' : '') + Math.abs(pp).toFixed(1) + ' pp'; };
+  const allRow = () => { const d = dash.data('cream_period'); return d.status === 'ok' && d.data ? d.data.find((r) => r.line_item === 'All channels') : null; };
+
+  dash.draw('cream-cur', (el) => { const r = allRow(); el.textContent = r ? F.pct(r.cur, 1) : '—'; });
+  dash.draw('cream-prev', (el) => { const r = allRow(); el.textContent = r ? F.pct(r.prev, 1) : '—'; });
+  dash.draw('cream-dir', (el) => {
+    const r = allRow(); el.className = '';
+    if (!r || r.change == null) { el.textContent = '—'; return; }
+    const dir = dirOf(r.change);
+    el.textContent = dir === 'up' ? 'up ' + ppText(r.change) : dir === 'down' ? 'down ' + ppText(r.change) : 'steady (' + ppText(r.change) + ')';
+    el.classList.add(dir === 'up' ? 'am-ok' : dir === 'down' ? 'am-bad' : 'am-muted');
+  });
+
+  dash.draw('cream-cards', (el) => {
+    const p = dash.data('cream_period'), s = dash.data('cream_share');
+    if (p.status === 'error' || s.status === 'error') { el.replaceChildren(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: 'Failed to load'})); return; }
+    if (p.status !== 'ok' || s.status !== 'ok' || !p.data || !s.data) { el.textContent = '—'; return; }
+    const parse = d3.utcParse('%Y-%m-%d');
+    const cards = [];
+    for (const item of ORDER) {
+      const pr = p.data.find((r) => r.line_item === item); if (!pr) continue;
+      const low = pr.mtd_leads < 100;
+      const where = 'line_item=' + F.enc(item);
+      const card = document.createElement('div');
+      card.className = 'am-card am-cc' + (item === 'All channels' ? ' am-total' : '') + (low ? ' am-low' : '');
+      card.id = 'cream-' + item.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+      const top = document.createElement('div'); top.className = 'am-cc-top';
+      const name = document.createElement('div'); name.className = 'am-cc-name'; name.textContent = item;
+      const dir = dirOf(pr.change);
+      const badge = document.createElement('span'); badge.className = 'am-dir ' + (low ? 'flat' : dir);
+      Object.assign(badge.dataset, {source: 'cream_period', field: 'change', where});
+      badge.textContent = low ? 'Too few leads' : (dir === 'up' ? '▲ ' : dir === 'down' ? '▼ ' : '● ') + ppText(pr.change);
+      top.append(name, badge);
+      const big = document.createElement('div'); big.className = 'am-cc-big';
+      Object.assign(big.dataset, {source: 'cream_period', field: 'cur', where});
+      big.textContent = F.pct(pr.cur, 1);
+      const cap = document.createElement('div'); cap.className = 'am-cc-cap';
+      const prev = document.createElement('span'); Object.assign(prev.dataset, {source: 'cream_period', field: 'prev', where}); prev.textContent = F.pct(pr.prev, 1);
+      const mtd = document.createElement('span'); Object.assign(mtd.dataset, {source: 'cream_period', field: 'mtd', where}); mtd.textContent = F.pct(pr.mtd, 1);
+      cap.append(pr.cur_week + ' so far · ' + (pr.prev_week || 'Last week') + ' ', prev, ' · MTD ', mtd);
+      const spark = document.createElement('div'); spark.className = 'am-spark';
+      spark.dataset.source = 'cream_share';
+      spark._pts = s.data.filter((r) => r.line_item === item && r.share != null).map((r) => ({...r, t: parse(r.date)})).sort((a, b) => a.t - b.t);
+      spark._prev = pr.prev;
+      card.append(top, big, cap, spark);
+      cards.push(card);
+    }
+    el.replaceChildren(...cards);
+    el.querySelectorAll('.am-spark').forEach((wrap) => {
+      const pts = wrap._pts || [];
+      const W = Math.max(wrap.clientWidth, 120), H = 56;
+      const lo = Math.min(d3.min(pts, (p) => p.share) ?? 0, wrap._prev ?? 1), hi = Math.max(d3.max(pts, (p) => p.share) ?? 0.3, wrap._prev ?? 0);
+      const pad = Math.max((hi - lo) * 0.25, 0.01);
+      const x = d3.scaleUtc().domain([new Date(Date.UTC(2026, 10, 1)), new Date(Date.UTC(2026, 10, 30))]).range([4, W - 4]);
+      const y = d3.scaleLinear().domain([Math.max(0, lo - pad), hi + pad]).range([H - 14, 4]);
+      const svg = d3.select(wrap).append('svg').attr('width', '100%').attr('height', H).attr('viewBox', `0 0 ${W} ${H}`)
+        .attr('role', 'img').attr('aria-label', 'Daily cream share');
+      if (wrap._prev != null) {
+        svg.append('line').attr('x1', 4).attr('x2', W - 4).attr('y1', y(wrap._prev)).attr('y2', y(wrap._prev))
+          .style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '3 3');
+      }
+      svg.append('path').datum(pts).attr('fill', 'none').style('stroke', dash.colors[0]).attr('stroke-width', 2)
+        .attr('stroke-linejoin', 'round').attr('d', d3.line().x((p) => x(p.t)).y((p) => y(p.share)));
+      svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', (p) => x(p.t)).attr('cy', (p) => y(p.share)).attr('r', 2).style('fill', dash.colors[0]);
+      const capt = (t, xx, anchor) => svg.append('text').attr('x', xx).attr('y', H - 2).attr('text-anchor', anchor).text(t)
+        .style('fill', 'var(--cds-text-secondary)').style('font-size', '10px');
+      capt('1 Nov', 4, 'start'); capt('30 Nov', W - 4, 'end');
+      if (wrap._prev != null) svg.append('text').attr('x', W - 4).attr('y', y(wrap._prev) - 3).attr('text-anchor', 'end').text('last wk avg')
+        .style('fill', 'var(--cds-text-secondary)').style('font-size', '10px');
+      const tip = document.createElement('div'); tip.className = 'am-tip'; wrap.append(tip);
+      const dot = svg.append('circle').attr('r', 3.5).style('fill', 'var(--color-fg)').style('opacity', 0);
+      const move = (event) => {
+        if (!pts.length) return;
+        const [mx] = d3.pointer(event, svg.node());
+        const t = x.invert(mx);
+        const near = pts.reduce((a, b) => (Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a));
+        dot.attr('cx', x(near.t)).attr('cy', y(near.share)).style('opacity', 1);
+        tip.replaceChildren();
+        const b = document.createElement('b'); b.textContent = F.pct(near.share, 1);
+        const s2 = document.createElement('span'); s2.textContent = d3.utcFormat('%-d %b')(near.t) + ' · ' + F.num(near.cream_leads) + ' of ' + F.num(near.leads);
+        tip.append(b, s2);
+        const px = x(near.t) * (wrap.clientWidth / W);
+        tip.style.left = Math.min(Math.max(px, 70), wrap.clientWidth - 70) + 'px';
+        tip.style.top = y(near.share) + 'px';
+        tip.style.opacity = 1;
+      };
+      svg.on('pointermove', move).on('pointerdown', move).on('pointerleave', () => { tip.style.opacity = 0; dot.style('opacity', 0); });
+    });
+  });
+
+  dash.draw('cream-heat', (el) => {
+    const p = dash.data('cream_period'), s = dash.data('cream_share');
+    if (p.status === 'error' || s.status === 'error') { el.replaceChildren(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: 'Failed to load'})); return; }
+    if (p.status !== 'ok' || s.status !== 'ok' || !p.data || !s.data) { el.textContent = '—'; return; }
+    const parse = d3.utcParse('%Y-%m-%d'), fmtDay = d3.utcFormat('%-d %b');
+    const dates = Array.from(new Set(s.data.map((r) => r.date))).sort();
+    const table = document.createElement('table'); table.className = 'am-mx am-heat'; table.id = 'cream-table';
+    table.setAttribute('aria-label', 'Cream share by day and line item');
+    const thead = document.createElement('thead'); const hr = document.createElement('tr');
+    const h0 = document.createElement('th'); h0.className = 'am-stick'; h0.textContent = 'Line item'; hr.append(h0);
+    dates.forEach((d) => { const th = document.createElement('th'); th.textContent = fmtDay(parse(d)); hr.append(th); });
+    for (const lab of ['Last wk', 'This wk', 'Change']) { const th = document.createElement('th'); th.className = 'am-per'; th.textContent = lab; hr.append(th); }
+    thead.append(hr); table.append(thead);
+    const tb = document.createElement('tbody');
+    for (const item of ORDER) {
+      const pr = p.data.find((r) => r.line_item === item); if (!pr) continue;
+      const low = pr.mtd_leads < 100;
+      const tr = document.createElement('tr');
+      const th = document.createElement('th'); th.className = 'am-stick'; th.scope = 'row'; th.textContent = item; tr.append(th);
+      for (const d of dates) {
+        const r = s.data.find((x) => x.line_item === item && x.date === d);
+        const td = document.createElement('td'); td.className = 'am-hc';
+        const v = r ? r.share : null;
+        td.textContent = F.pct(v, 1);
+        Object.assign(td.dataset, {source: 'cream_share', field: 'share', where: 'line_item=' + F.enc(item) + '&date=' + d});
+        if (!low && v != null && pr.prev != null) {
+          const diff = v - pr.prev;
+          const k = Math.min(Math.abs(diff) / 0.05, 1);
+          if (Math.abs(diff) >= 0.005) td.style.background = 'color-mix(in srgb, var(--color-' + (diff > 0 ? 'ok' : 'bad') + ') ' + Math.round(8 + k * 22) + '%, transparent)';
+        }
+        if (low) td.style.opacity = 0.5;
+        tr.append(td);
+      }
+      for (const [f, txt] of [['prev', F.pct(pr.prev, 1)], ['cur', F.pct(pr.cur, 1)], ['change', ppText(pr.change)]]) {
+        const td = document.createElement('td'); td.className = 'am-per'; td.textContent = txt;
+        Object.assign(td.dataset, {source: 'cream_period', field: f, where: 'line_item=' + F.enc(item)});
+        if (f === 'change' && !low) { const dd = dirOf(pr.change); if (dd !== 'flat') td.classList.add(dd === 'up' ? 'am-c-ok' : 'am-c-bad'); }
+        tr.append(td);
+      }
+      tb.append(tr);
+    }
+    table.append(tb);
+    el.replaceChildren(table);
+    requestAnimationFrame(() => { el.scrollLeft = el.scrollWidth; });
+  });
+})();
+</script>
+<div class="am-foot">Prepared by HiveMinds · Refreshed daily</div>
+</div>
+<script>
+fetch('data.json', {cache: 'no-store'})
+  .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(function (p) { window.__amLoad(p); })
+  .catch(function (e) { window.__amError = String(e); var l = document.getElementById('am-loading'); if (l) l.textContent = 'Could not load the data. Please refresh.'; });
+</script>
+</body>
+</html>

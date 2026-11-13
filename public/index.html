@@ -177,11 +177,42 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 @media (prefers-reduced-motion:no-preference){.am-bar-fill{transition:width var(--cds-dur-slow) var(--cds-ease-out)}}
 </style>
 
+<style>
+/* polish pass */
+.am-head{padding-bottom:var(--cds-pad-sm)}
+.am-src{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.am-src span{display:inline-flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:999px;padding:3px 10px 3px 8px;white-space:nowrap}
+.am-src span i{width:7px;height:7px;border-radius:50%;background:var(--color-ok);display:inline-block}
+.am-src span.stale i{background:var(--color-warn)} .am-src span.old i{background:var(--color-bad)}
+.am-src span b{font-weight:var(--cds-font-weight-medium);color:var(--color-fg)}
+.am-tabs{background:color-mix(in srgb,var(--color-bg) 90%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(8px);backdrop-filter:saturate(1.4) blur(8px)}
+.am-panel > .am-h2:first-child{font-family:var(--font-anthropic-serif);font-weight:400;font-size:clamp(24px,4.4vw,30px);letter-spacing:-.01em}
+.am-panel .am-sec{margin-top:var(--cds-gap-xl);padding-top:var(--cds-gap-lg);border-top:1px solid var(--color-border-line)}
+.am-panel .am-sec .am-h2{font-size:var(--cds-font-size-heading)}
+.am-more{margin:2px 0 var(--cds-gap-sm)}
+.am-more > summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);color:var(--am-accent);padding:4px 0;user-select:none}
+.am-more > summary::-webkit-details-marker{display:none}
+.am-more > summary::before{content:'';width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .15s ease;margin-right:2px}
+.am-more[open] > summary::before{transform:rotate(45deg)}
+.am-more > .am-sub{margin-top:4px;padding:10px 12px;background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:10px;max-width:none}
+.am-more-lg > summary{font-size:var(--cds-font-size-heading);color:var(--color-fg);padding:2px 0}
+.am-panel .am-sec:has(> .am-more-lg){padding-bottom:0}
+.am-card{box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.am-notes{border-top:1px solid var(--color-border-line);padding-top:var(--cds-gap-md)}
+.am-foot{border-top:1px solid var(--color-border-line);padding-top:12px}
+@media (max-width:520px){.am-panel .am-sec{margin-top:var(--cds-gap-lg);padding-top:var(--cds-gap-md)}}
+.am-notes > summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);color:var(--am-accent)}
+.am-notes > summary::-webkit-details-marker{display:none}
+.am-notes > summary::before{content:'';width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .15s ease;margin-right:2px}
+.am-notes[open] > summary::before{transform:rotate(45deg)}
+@media (max-width:520px){.am-src{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-16px;padding-right:16px}.am-src::-webkit-scrollbar{display:none}}
+.pr-more{display:block;width:100%;font:inherit;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);color:var(--am-accent);background:transparent;border:0;border-top:1px solid var(--color-border-line);padding:10px;cursor:pointer}
+</style>
 <div class="am">
   <header class="am-head" id="top">
     <div class="am-eyebrow">Axis Max Life · Term · Direct &amp; D2C</div>
-    <h1 class="am-title">November performance</h1>
-    <div class="am-asof">Data through <span data-draw="asof" data-source="as_of">—</span> · Leads by creation date · Sales and APE by payment date</div>
+    <h1 class="am-title"><span data-draw="title-month">Monthly</span> performance</h1>
+    <div class="am-src" data-draw="src-strip" aria-label="Data sources and how fresh they are"></div>
   </header>
 
   <nav class="am-tabs" role="tablist" aria-label="Dashboard sections">
@@ -228,7 +259,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
     <div class="am-sec" id="groups">
       <h2 class="am-h2">Achievement by group</h2>
-      <p class="am-sub">Month-to-date actual as % of month-to-date target. The marker is 100%.</p>
+      <p class="am-sub">Month-to-date actual against month-to-date target. The marker is 100%.</p>
       <div class="am-legend"><span><i class="am-bg-ok"></i>On or above target</span><span><i class="am-bg-warn"></i>90–99%</span><span><i class="am-bg-bad"></i>Below 90%</span></div>
       <div class="am-card am-groups" data-draw="group-list" data-source="group_progress targets_vs_actuals"></div>
     </div>
@@ -236,7 +267,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <details class="am-notes" id="notes">
       <summary>How these numbers are built</summary>
       <ul>
-        <li>Leads come from the unique lead dump, dated by lead creation date. Sales and APE come from the Direct &amp; D2C sales dump, dated by payment date. Spend comes from the Daily Spends Tracker (Term All Channels).</li>
+        <li>Leads are dated by lead creation date; sales and APE by payment date. Leads come from the unique lead dump, dated by lead creation date. Sales and APE come from the Direct &amp; D2C sales dump, dated by payment date. Spend comes from the Daily Spends Tracker (Term All Channels).</li>
         <li>Line items follow the Master Tracker mapping. NewBlank7 sits in Brand. Bottom Funnel = Brand + Core + Others. Display = PR + RM. On this tab, Netcore includes the cross-sell and upsell journeys, as in the plan; the Day on day tab shows the Netcore line item alone, against its own plan rows.</li>
         <li>Targets are the Nov'26 media plan. Month-to-date and daily targets follow the plan's daily phasing (QL curve for leads, NOP and APE curves for sales and APE), not a straight split by days.</li>
         <li>Total sales and APE targets use the plan's unique-sale figures (8,688 sales, ₹25.49 Cr APE). Group targets add up to more because some sales count in more than one group.</li>
@@ -249,7 +280,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
   <section id="daily" class="am-panel" role="tabpanel" hidden>
     <h2 class="am-h2">Day on day</h2>
-    <p class="am-sub">Pick a line item. Swipe the table sideways for earlier days; week and month totals sit at the right. Achieved % compares each day with that day's plan target. Cost pacing = Spend ÷ Target spend (green within ±10%). CPL turns green at or under its target. CPL = Spend ÷ Leads · CVR = Sales ÷ Leads · COA = Spend ÷ APE.</p>
+    <p class="am-sub">Each line item against its daily plan. Week and month totals sit at the right.</p>
+    <details class="am-more"><summary>How to read this</summary><p class="am-sub">Swipe the table sideways for earlier days. Achieved % compares each day with that day's plan target. Cost pacing = Spend ÷ Target spend (green within ±10%). CPL turns green at or under its target. CPL = Spend ÷ Leads · CVR = Sales ÷ Leads · COA = Spend ÷ APE.</p></details>
     <div class="am-chips" role="group" aria-label="Line item" id="am-items">
       <button type="button" class="am-chip" data-item="All channels" aria-pressed="true">All channels</button>
       <button type="button" class="am-chip" data-item="SEO" aria-pressed="false">SEO</button>
@@ -267,7 +299,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
     <div class="am-sec" id="trend">
       <h2 class="am-h2">Trend</h2>
-      <p class="am-sub">The same line item, one metric at a time. Tap a bar for that day's numbers.</p>
+      <p class="am-sub">The same line item, one metric at a time. Tap a bar for the day's numbers.</p>
       <div class="am-controls">
         <div class="am-seg" role="group" aria-label="Metric" id="am-metric">
           <button type="button" data-metric="cvr" aria-pressed="true">CVR</button>
@@ -290,21 +322,23 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
   <section id="cream" class="am-panel" role="tabpanel" hidden>
     <h2 class="am-h2">Cream audience</h2>
-    <p class="am-sub">Cream = leads with 10L+ income, salaried and graduate &amp; above. Each card compares this week's cream share of leads with the line item's all-time best day, taken from August, the best month. Days with too few leads, or with a share far above the rest of the month, don't count as a best day.</p>
+    <p class="am-sub">Share of leads with 10L+ income, salaried and graduate &amp; above, against each line item's best day.</p>
+    <details class="am-more"><summary>How to read this</summary><p class="am-sub">Each card compares this week's cream share of leads with the line item's all-time best day, taken from August, the best month. Days with too few leads, or with a share far above the rest of the month, don't count as a best day.</p></details>
     <p class="am-lede" id="cream-lede">Across all channels, cream is <b data-draw="cream-cur" data-source="cream_period" data-field="cur" data-where="line_item=All channels">—</b> of leads this week. The best day was <b data-draw="cream-best" data-source="cream_period" data-field="best" data-where="line_item=All channels">—</b> on <span data-draw="cream-best-date" data-source="cream_period" data-field="best_date" data-where="line_item=All channels">—</span>, so this week is <b data-draw="cream-gap" data-source="cream_period" data-field="gap" data-where="line_item=All channels">—</b>.</p>
     <div class="am-legend"><span><i class="am-bg-ok"></i>95% of best or more</span><span><i class="am-bg-warn"></i>85–95%</span><span><i class="am-bg-bad"></i>Below 85%</span></div>
     <div class="am-cgrid" data-draw="cream-cards" data-source="cream_period cream_share"></div>
 
     <div class="am-sec" id="cream-daily">
       <h2 class="am-h2">Cream share by day</h2>
-      <p class="am-sub">Each cell is that day's cream share, coloured by how close it came to the line item's best day: green at 95% of best or more, amber at 85–95%, red below 85%.</p>
+      <p class="am-sub">Each cell is the day's cream share, coloured by how close it came to the line item's best day.</p>
       <div class="am-mx-wrap" data-draw="cream-heat" data-source="cream_share cream_period"></div>
     </div>
   </section>
 
   <section id="prospecting" class="am-panel" role="tabpanel" hidden>
     <h2 class="am-h2">Prospecting · Meta + Google</h2>
-    <p class="am-sub">MTD <span data-draw="pr-win" data-field="mtd">—</span> vs LMTD <span data-draw="pr-win" data-field="lmtd">—</span> · CPL = Spend ÷ Leads · QL% = QL ÷ Leads · CPQQG = Spend ÷ QQ-G · from the GA4 consolidated report, data through <span data-draw="pr-win" data-field="asof">—</span></p>
+    <p class="am-sub">MTD <span data-draw="pr-win" data-field="mtd">—</span> against the same days last month · GA4 consolidated report</p>
+    <details class="am-more"><summary>How to read this</summary><p class="am-sub">CPL = Spend ÷ Leads · QL% = QL ÷ Leads · CPQQG = Spend ÷ QQ-G. Scope: Meta and Google rows with Theme1 = Prospecting. LMTD = <span data-draw="pr-win" data-field="lmtd">—</span>. Data through <span data-draw="pr-win" data-field="asof">—</span>. The latest day's CPQQG reads high until its QQ-G comes in.</p></details>
     <p class="am-lede">Prospecting CPQQG is <b data-draw="pr-lede" data-field="cpqqg" data-ch="Total">—</b> MTD (<b data-draw="pr-lede" data-field="cpqqg_chg" data-ch="Total">—</b>). Meta <b data-draw="pr-lede" data-field="cpqqg" data-ch="Meta">—</b> (<b data-draw="pr-lede" data-field="cpqqg_chg" data-ch="Meta">—</b>), Google <b data-draw="pr-lede" data-field="cpqqg" data-ch="Google">—</b> (<b data-draw="pr-lede" data-field="cpqqg_chg" data-ch="Google">—</b>).</p>
 
     <div class="am-chips" role="group" aria-label="Channel" id="pr-ch">
@@ -330,30 +364,34 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
     <div class="am-sec" id="pr-actions">
       <h2 class="am-h2">What to do</h2>
-      <p class="am-sub">Worked out from the numbers on this tab: line items against their channel's CPQQG, creatives against the Meta average over the last 14 days.</p>
+      <p class="am-sub">Worked out from the numbers on this tab.</p>
       <div class="am-card"><ul class="pr-acts" data-draw="pr-actions"></ul></div>
     </div>
 
     <div class="am-sec" id="pr-lines">
       <h2 class="am-h2">Line items</h2>
-      <p class="am-sub">MTD, with change vs LMTD. Status compares CPQQG with the channel's: Efficient ≤ 0.9×, Expensive ≥ 1.2×. Tap a row for its day-on-day trend.</p>
+      <p class="am-sub">MTD, with change against LMTD. Tap a row to see it day by day.</p>
+      <details class="am-more"><summary>How to read this</summary><p class="am-sub">Status compares each line item's CPQQG with its channel's: Efficient at 0.9× or less, Expensive at 1.2× or more. Campaign names drop the common prefix, the age band and the launch date's year.</p></details>
       <div class="am-chips" role="group" aria-label="Channel" id="pr-li-ch">
         <button type="button" class="am-chip" data-ch="Meta" aria-pressed="true">Meta</button>
         <button type="button" class="am-chip" data-ch="Google" aria-pressed="false">Google</button>
       </div>
       <div class="am-mx-wrap" data-draw="pr-camps"></div>
-      <div class="am-card" style="margin-top:var(--cds-gap-md)">
+      <details class="am-more" id="pr-li-more"><summary>Day by day for the selected line item</summary>
+      <div class="am-card" style="margin-top:var(--cds-gap-sm)">
         <div class="am-chart-head"><div class="am-chart-title" data-draw="pr-li-title">—</div>
           <div class="am-seg" role="group" aria-label="Metric" id="pr-li-metric"><button type="button" data-m="cpqqg" aria-pressed="true">CPQQG</button><button type="button" data-m="cpl" aria-pressed="false">CPL</button><button type="button" data-m="qlp" aria-pressed="false">QL%</button><button type="button" data-m="spend" aria-pressed="false">Spend</button></div>
         </div>
         <div class="am-legend"><span><i style="background:var(--am-accent)"></i>Line item</span><span><i style="background:var(--cds-chart-reference)"></i>Channel</span></div>
         <div class="am-chart pr-chart" data-draw="pr-li-chart"></div>
       </div>
+      </details>
     </div>
 
     <div class="am-sec" id="pr-creatives">
       <h2 class="am-h2">Meta creatives · last 14 days</h2>
-      <p class="am-sub">Ads with ₹1L+ spend, <span data-draw="pr-win" data-field="l14">—</span>. Meta CPQQG over the period: <b data-draw="pr-adavg">—</b>. Scale ≤ 0.8× that, Pause ≥ 1.5× or no QQ-G.</p>
+      <p class="am-sub">Ads with ₹1L+ spend, <span data-draw="pr-win" data-field="l14">—</span>, against the Meta CPQQG of <b data-draw="pr-adavg">—</b>.</p>
+      <details class="am-more"><summary>How to read this</summary><p class="am-sub">Scale = CPQQG at 0.8× the Meta average or less. Pause = 1.5× or more, or no QQ-G at all. Creative attributes come from the ad naming convention. Calls on ads with fewer than about 40 QQ-G are directional.</p></details>
       <div class="am-controls"><div class="am-seg" role="group" aria-label="View" id="pr-cr-view"><button type="button" data-v="Scale" aria-pressed="true">Top performers</button><button type="button" data-v="Pause" aria-pressed="false">Pause</button><button type="button" data-v="all" aria-pressed="false">All ₹1L+</button></div></div>
       <div class="am-mx-wrap" data-draw="pr-ads"></div>
       <div class="am-card" style="margin-top:var(--cds-gap-md)"><div class="am-chart-title" style="margin-bottom:6px">Why the top performers work</div><ul class="pr-acts" data-draw="pr-traits"></ul></div>
@@ -366,10 +404,12 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
         <div class="am-legend"><span><i style="background:var(--am-accent)"></i>Video</span><span><i style="background:#c46a2b"></i>Static</span></div>
         <div class="am-chart-title">Share of Meta spend</div>
         <div class="am-chart pr-chart sm" data-draw="pr-fmt-share"></div>
-        <div class="am-chart-head" style="margin-top:var(--cds-gap-md)"><div class="am-chart-title">Efficiency</div>
+        <details class="am-more"><summary>Efficiency by format, day by day</summary>
+        <div class="am-chart-head" style="margin-top:var(--cds-gap-sm)"><div class="am-chart-title">Efficiency</div>
           <div class="am-seg" role="group" aria-label="Metric" id="pr-fmt-metric"><button type="button" data-m="cpqqg" aria-pressed="true">CPQQG</button><button type="button" data-m="cpl" aria-pressed="false">CPL</button><button type="button" data-m="qlp" aria-pressed="false">QL%</button></div>
         </div>
         <div class="am-chart pr-chart sm" data-draw="pr-fmt-chart"></div>
+        </details>
       </div>
     </div>
   </section>
@@ -380,13 +420,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <div data-draw="cc-root"></div>
 
 
-  <div class="am-controls"><label class="am-sub" style="margin:0" for="cc-day">Day</label><select id="cc-day" class="am-select"></select><span class="am-sub" style="margin:0">Compared with the median of the 7 days before it</span></div>
-
-  <section class="am-sec" style="margin-top:8px" id="cc-flag-sec">
-    <h2 class="am-h2">Today's flags</h2>
-    <p class="am-sub">Raised automatically when a segment moves past a threshold against its own last 7 days.</p>
-    <div class="am-card"><ul class="cc-flags" id="cc-flags"></ul></div>
-  </section>
+  <div class="am-controls"><label class="am-sub" style="margin:0" for="cc-day">Day</label><select id="cc-day" class="am-select"></select><span class="am-sub" style="margin:0">against the median of the 7 days before it</span></div>
 
   <section class="am-sec">
     <h2 class="am-h2">Overall</h2>
@@ -403,11 +437,13 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       </div>
       <div class="yd-h" style="margin-top:14px">Check today</div><ul class="yd-list" id="cc-yd-do"></ul>
     </div>
+    <details class="am-more"><summary>All flags by segment</summary><div class="am-card" style="margin-top:var(--cds-gap-sm)"><ul class="cc-flags" id="cc-flags"></ul></div></details>
   </section>
 
   <section class="am-sec">
     <h2 class="am-h2">Segments</h2>
-    <p class="am-sub">Red or green when a number is meaningfully worse or better than that segment's last 7 days. Undialled = leads still open and never dialled.</p>
+    <p class="am-sub">Coloured against each segment's own last 7 days.</p>
+    <details class="am-more"><summary>How to read this</summary><p class="am-sub">Red or green when a number is meaningfully worse or better than that segment's last 7 days; hover a cell for the 7-day median. Undialled = leads still open and never dialled. Closed, no dial = leads closed without a dial attempt.</p></details>
     <div class="am-mx-wrap" id="cc-seg-table"></div>
   </section>
 
@@ -433,8 +469,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   </section>
 
   <section class="am-sec">
-    <h2 class="am-h2">What the report says · 14 Oct – 12 Nov</h2>
-    <p class="am-sub">Structural findings from the first 30 days of this report, written on 13 Nov. The flags above track them day by day.</p>
+    <details class="am-more am-more-lg"><summary>30-day findings · 8 structural issues</summary>
+    <p class="am-sub" style="margin-top:8px">Written on 13 Nov from the 14 Oct – 12 Nov report. They don't update with the daily data.</p>
     <div class="cc-find">
       <div class="am-card"><span class="am-dir down">Leakage</span><h3>The 7–9 pm dead zone</h3><p>12% of leads arrive between 7 and 9 pm. On a normal weekday 14% of them are never dialled, about 230 leads a day, against 2–3% at every other hour. Leads after 9 pm roll into the next day's queue and get dialled; 7–9 pm leads don't. Fix: move the business-date cut-off to 7 pm, or keep a late shift until 9 pm.</p></div>
       <div class="am-card"><span class="am-dir down">Leakage</span><h3>1 in 10 leads is closed without a single dial</h3><p>10.6% of leads close with no dial attempt, 15–25% in Bottom Funnel (24.6% on 12 Nov). These are likely duplicates, existing customers or auto-closures, but the report doesn't say. Ask for a closure reason; if they are dupes, the media lead count is overstated by the same share.</p></div>
@@ -445,6 +481,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <div class="am-card"><span class="am-dir flat">Quality</span><h3>Affiliate connects most, talks least</h3><p>Affiliate has the best Connect% (24%) but the shortest talk time (1.8 min against 2.8 in Bottom Funnel). Quick connects and short calls point to low-intent or wrong-number leads. Worth checking against Affiliate CVR on the tracker.</p></div>
       <div class="am-card"><span class="am-dir flat">Staffing</span><h3>Sundays run 20% lighter</h3><p>Sundays average 207 agents against 252–267 on other days, and undialled leads jump (15% on Sun 8 Nov, 22% in Top Funnel). 7 Nov looks like a dialer or system outage: logins were normal but calls per agent fell 60% and idle rose to 44% in every segment.</p></div>
     </div>
+    </details>
   </section>
 
   <details class="am-notes">
@@ -463,17 +500,11 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
   <section id="payments" class="am-panel" role="tabpanel" hidden>
     <h2 class="am-h2">Payments</h2>
-    <p class="am-sub">From the Payment Report · transactions are payment attempts, so retries count as failures</p>
+    <p class="am-sub">Payment Report · transactions are payment attempts, so retries count as failures</p>
     <div data-draw="py-root"></div>
 
 
-  <div class="am-controls"><label class="am-sub" style="margin:0" for="py-day">Day</label><select id="py-day" class="am-select"></select><span class="am-sub" style="margin:0">Compared with the median of the 7 days before it</span></div>
-
-  <section class="am-sec" style="margin-top:8px">
-    <h2 class="am-h2">Today's flags</h2>
-    <p class="am-sub">Raised when a segment moves past a threshold against its own last 7 days.</p>
-    <div class="am-card"><ul class="cc-flags" id="py-flags"></ul></div>
-  </section>
+  <div class="am-controls"><label class="am-sub" style="margin:0" for="py-day">Day</label><select id="py-day" class="am-select"></select><span class="am-sub" style="margin:0">against the median of the 7 days before it</span></div>
 
   <section class="am-sec">
     <h2 class="am-h2">Overall</h2>
@@ -490,11 +521,13 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       </div>
       <div class="yd-h" style="margin-top:14px">Check today</div><ul class="yd-list" id="py-yd-do"></ul>
     </div>
+    <details class="am-more"><summary>All flags by segment</summary><div class="am-card" style="margin-top:var(--cds-gap-sm)"><ul class="cc-flags" id="py-flags"></ul></div></details>
   </section>
 
   <section class="am-sec">
     <h2 class="am-h2">Segments</h2>
-    <p class="am-sub">Other = Overall minus Core, PR and SEO, which the report doesn't break out. Red or green when a number is meaningfully worse or better than that segment's last 7 days.</p>
+    <p class="am-sub">Coloured against each segment's own last 7 days.</p>
+    <details class="am-more"><summary>How to read this</summary><p class="am-sub">Other = Overall minus Core, PR and SEO, which the report doesn't break out; it reads high when the segment tabs lag. Red or green when a number is meaningfully worse or better than that segment's last 7 days; hover a cell for the 7-day median.</p></details>
     <div class="am-mx-wrap" id="py-seg-table"></div>
   </section>
 
@@ -519,8 +552,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   </section>
 
   <section class="am-sec">
-    <h2 class="am-h2">What the report says · 14 Oct – 12 Nov</h2>
-    <p class="am-sub">Structural findings from the first 30 days, written on 13 Nov. Cross-checked against the sales and call-centre data on this dashboard.</p>
+    <details class="am-more am-more-lg"><summary>30-day findings · 8 structural issues</summary>
+    <p class="am-sub" style="margin-top:8px">Written on 13 Nov from the 14 Oct – 12 Nov report. They don't update with the daily data.</p>
     <div class="cc-find">
       <div class="am-card"><span class="am-dir up">Trend</span><h3>Success is up 4 pts, all from UPI</h3><p>Success rose from 75.7% (14–27 Oct) to 80.1% (29 Oct – 12 Nov). Breaking it down, the shift in payment mix added nothing; all of the gain is UPI working better (74% → 80%). UPI peaked at 86% on 1 Nov and has slipped back to about 78% since, so it's worth asking whether a gateway or app change happened around 20 Oct and what changed after 1 Nov.</p></div>
       <div class="am-card"><span class="am-dir down">Leakage</span><h3>UPI is 79% of all failed payments</h3><p>About 80 payment attempts fail a day, 60 of them on UPI. Every point of UPI success is worth about 3 more successful payments a day. Failure reasons by UPI app (GPay, PhonePe, Paytm) and by error code would show whether it's user drop-off, bank declines or timeouts.</p></div>
@@ -531,6 +564,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <div class="am-card"><span class="am-dir flat">Coverage</span><h3>The report covers about 58% of tracker sales</h3><p>For 1–11 Nov it shows 3,071 successful payments against 5,333 sales on the tracker. Coverage is 86% for Core, 85% for PR and 65% for SEO. It probably counts only online checkout payments; worth confirming which journeys are in it before using it as a sales proxy.</p></div>
       <div class="am-card"><span class="am-dir flat">Data</span><h3>Gaps to close with the client</h3><p>"Transactions" are attempts, so retries count as failures; a unique-customer success rate would show how many buyers are actually lost. Segment tabs run a day behind Overall (12 Nov shows 11 transactions against 400). About 70% of volume sits outside Core, PR and SEO; Brand, RM and Affiliate tabs would close that.</p></div>
     </div>
+    </details>
   </section>
 
   <details class="am-notes">
@@ -1085,7 +1119,7 @@ dash.calc('cream_period', {
   });
 })();
 </script>
-<div class="am-foot">Prepared by HiveMinds · Refreshed daily</div>
+<div class="am-foot">Prepared by HiveMinds · each tab shows data up to the date in its source chip above</div>
 </div>
 <style>
 .pr-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1329,7 +1363,7 @@ dash.calc('cream_period', {
   segs('pr-ov-metric', 'ovm', ['pr-ov-chart'], 'm');
   chips('pr-li-ch', 'lich', ['pr-camps', 'pr-li-title', 'pr-li-chart']);
   segs('pr-li-metric', 'lim', ['pr-li-chart'], 'm');
-  segs('pr-cr-view', 'cr', ['pr-ads'], 'v');
+  segs('pr-cr-view', 'cr', ['pr-ads'], 'v'); document.querySelectorAll('#pr-cr-view button').forEach((b) => b.addEventListener('click', () => { st.crAll = false; dash.draw('pr-ads'); }));
   segs('pr-fmt-metric', 'fm', ['pr-fmt-chart'], 'm');
 
   dash.draw('pr-actions', (ul) => { const a = ok('pr_actions'); ul.replaceChildren(); if (!a) { ul.append(Object.assign(document.createElement('li'), {className: 'pr-plain', textContent: '—'})); return; }
@@ -1351,7 +1385,7 @@ dash.calc('cream_period', {
       td(tr, F.pct(r.qlp)); toneCell(td(tr, sg(r.qlp_chg, (v) => (v * 100).toFixed(1) + 'p')), 'qlp', r.qlp_chg);
       td(tr, F.num(r.qqg)); td(tr, F.rupee(r.cpqqg)); toneCell(td(tr, sg(r.cpqqg_chg, (v) => F.pct(v))), 'cpqqg', r.cpqqg_chg);
       pillCell(tr, r.status, {Efficient: 'up', Expensive: 'down'}[r.status] || 'flat');
-      tr.addEventListener('click', () => { st.camp = r.campaign; dash.draw('pr-camps'); dash.draw('pr-li-title'); dash.draw('pr-li-chart'); });
+      tr.addEventListener('click', () => { st.camp = r.campaign; const m = document.getElementById('pr-li-more'); if (m) m.open = true; dash.draw('pr-camps'); dash.draw('pr-li-title'); dash.draw('pr-li-chart'); });
       tb.append(tr); }
     t.append(tb); el.replaceChildren(t); });
 
@@ -1366,6 +1400,7 @@ dash.calc('cream_period', {
   dash.draw('pr-adavg', (el) => { const s = ok('pr_adsum'); el.textContent = s ? F.rupee(s.avg) : '—'; });
   dash.draw('pr-ads', (el) => { const a = ok('pr_ads'); if (!a) return fail(el);
     let rows = st.cr === 'all' ? a : a.filter((r) => r.action === st.cr); if (st.cr === 'Pause') rows = rows.slice().sort((x, y) => y.spend - x.spend);
+    const total = rows.length; if (!st.crAll) rows = rows.slice(0, 6);
     const t = document.createElement('table'); t.className = 'am-mx'; t.append(head(['Creative', 'Spend', 'CPL', 'QL%', 'QQ-G', 'CPQQG', 'Prev 14d', '']));
     const tb = document.createElement('tbody');
     for (const r of rows) { const tr = document.createElement('tr'); tr.title = r.ad;
@@ -1374,7 +1409,8 @@ dash.calc('cream_period', {
       const cp = td(tr, r.cpqqg == null ? 'No QQ-G' : F.rupee(r.cpqqg)); cp.style.fontWeight = '600'; td(tr, F.rupee(r.cpqqg_p), 'am-tgt');
       pillCell(tr, r.action, {Scale: 'up', Pause: 'down'}[r.action] || 'flat'); tb.append(tr); }
     if (!rows.length) { const tr = document.createElement('tr'); const e = td(tr, 'No ads in this view', 'pr-l'); e.colSpan = 8; tb.append(tr); }
-    t.append(tb); el.replaceChildren(t); });
+    t.append(tb); el.replaceChildren(t);
+    if (total > 6) { const b = document.createElement('button'); b.type = 'button'; b.className = 'pr-more'; b.textContent = st.crAll ? 'Show top 6' : `Show all ${total}`; b.onclick = () => { st.crAll = !st.crAll; dash.draw('pr-ads'); }; el.append(b); } });
 
   dash.draw('pr-traits', (ul) => { const a = ok('pr_ads'), tr = ok('pr_traits'); ul.replaceChildren(); if (!a || !tr) return;
     const top = a.filter((r) => r.action === 'Scale'); if (!top.length) return;
@@ -1515,7 +1551,7 @@ window.ccInit = function () {
       if (b('wrap_conn_s') && r.wrap_conn_s >= 1.3 * b('wrap_conn_s') && !sys && !sysDay) out.push(['warn', 'Wrap', `${seg}: wrap ${F.sec(r.wrap_conn_s)} per connected call vs ${F.sec(b('wrap_conn_s'))} usual.`]);
     }
     if (!out.length) out.push(['flat', 'All clear', 'No segment crossed a threshold against its last 7 days.']);
-    for (const [t, tag, txt] of out) { const li = document.createElement('li'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = tag; const p = document.createElement('span'); p.textContent = txt; li.append(s, p); ul.append(li); }
+    for (const [t, tag, txt] of out) { const li = document.createElement('li'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = tag; const p = document.createElement('span'); p.textContent = txt; li.append(s, p); ul.append(li); } { const sm = ul.closest('details') && ul.closest('details').querySelector('summary'); if (sm) { const k = out.filter((x) => x[0] !== 'flat' || x[1] === 'Failed').length; sm.textContent = 'All flags by segment · ' + out.length; } }
   }
 
   function kpis() {
@@ -1583,7 +1619,7 @@ window.ccInit = function () {
     const W = el.clientWidth || 700, Hh = 240, m = {t: 12, r: 12, b: 24, l: 48};
     const svg = d3.select(el).append('svg').attr('width', W).attr('height', Hh).attr('role', 'img').attr('aria-label', M[k].l + ' by day, ' + seg);
     const lo = d3.min(pts, (p) => p.y), hi = d3.max(pts, (p) => p.y);
-    const y = d3.scaleLinear().domain([Math.min(0, lo), hi * 1.08]).nice().range([Hh - m.b, m.t]), x = d3.scaleUtc().domain(d3.extent(pts, (p) => p.x)).range([m.l, W - m.r]);
+    const rate = ['connect', 'util', 'idle_rate', 'und_pct'].includes(k); const y = d3.scaleLinear().domain(rate ? [Math.max(0, lo - (hi - lo) * 0.6), hi + (hi - lo) * 0.3] : [Math.min(0, lo), hi * 1.08]).nice().range([Hh - m.b, m.t]), x = d3.scaleUtc().domain(d3.extent(pts, (p) => p.x)).range([m.l, W - m.r]);
     svg.append('g').selectAll('line').data(y.ticks(4)).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y).attr('y2', y).style('stroke', 'var(--cds-chart-grid)');
     const ya = svg.append('g').attr('transform', `translate(${m.l - 4},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(M[k].f)); ya.select('.domain').remove();
     const xa = svg.append('g').attr('transform', `translate(0,${Hh - m.b})`).call(d3.axisBottom(x).ticks(Math.max(3, Math.floor(W / 90))).tickSize(0).tickFormat(d3.utcFormat('%-d %b'))); xa.select('.domain').remove();
@@ -1717,7 +1753,7 @@ window.pyInit = function (D) {
       if (seg === 'Overall' && r.dc_a + r.nb_a >= 8 && r.dcnb_s != null && r.dcnb_s < 0.45) out.push(['warn', 'Debit + NB', `Overall: debit card and net banking succeeded ${F.pct(r.dcnb_s, 0)} (${r.dc_ok + r.nb_ok} of ${r.dc_a + r.nb_a}).`]);
       if (seg === 'PR' && r.upi_s != null && r.upi_a >= 20) { const seo = get('SEO', state.day); if (seo && seo.upi_s != null && !incomplete('SEO', state.day) && seo.upi_s - r.upi_s >= 0.1) out.push(['warn', 'PR vs SEO', `PR UPI success ${F.pct(r.upi_s)} vs ${F.pct(seo.upi_s)} for SEO. Likely the in-app browser hand-off on Meta traffic.`]); }
     }
-    for (const [t, tag, txt] of out) { const li = document.createElement('li'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = tag; const p = document.createElement('span'); p.textContent = txt; li.append(s, p); ul.append(li); }
+    for (const [t, tag, txt] of out) { const li = document.createElement('li'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = tag; const p = document.createElement('span'); p.textContent = txt; li.append(s, p); ul.append(li); } { const sm = ul.closest('details') && ul.closest('details').querySelector('summary'); if (sm) { const k = out.filter((x) => x[0] !== 'flat' || x[1] === 'Failed').length; sm.textContent = 'All flags by segment · ' + out.length; } }
   }
 
   function kpis() {
@@ -1885,6 +1921,39 @@ window.pyCC = function () {
     if (!done) { done = true; lastW = w; window.pyInit(d.data); }
     else if (w !== lastW) { lastW = w; window.pyRedraw(); }
   });
+})();
+</script>
+<script>
+(function () {
+  const MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const fd = (s) => { const d = new Date(s + 'T00:00:00Z'); return d.getUTCDate() + ' ' + MON[d.getUTCMonth()].slice(0, 3); };
+  dash.draw('title-month', (el) => { const d = dash.data('as_of'); if (d.status === 'ok' && d.data) el.textContent = MON[+d.data.slice(5, 7) - 1]; });
+  dash.draw('src-strip', (el) => {
+    const pick = (id, f) => { const d = dash.data(id); return d.status === 'ok' && d.data ? f(d.data) : null; };
+    const items = [
+      ['Leads, sales &amp; spend', pick('as_of', (x) => x)],
+      ['GA4 prospecting', pick('pr_meta', (x) => x.as_of)],
+      ['Call centre', pick('cc_meta', (x) => x.daily_to)],
+      ['Payments', pick('pay_daily', (x) => x.reduce((m, r) => (r.date > m ? r.date : m), ''))]
+    ];
+    const today = new Date(); const t0 = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+    el.replaceChildren(...items.map(([name, d]) => {
+      const sp = document.createElement('span');
+      if (!d) { sp.innerHTML = `<i></i>${name} · <b>loading</b>`; sp.className = 'stale'; return sp; }
+      const age = Math.round((t0 - Date.parse(d + 'T00:00:00Z')) / 864e5);
+      sp.className = age > 3 ? 'old' : age > 2 ? 'stale' : '';
+      sp.innerHTML = `<i></i>${name} · data to <b>${fd(d)}</b>`;
+      sp.title = age > 2 ? `${age} days old` : 'Up to date';
+      return sp;
+    }));
+  });
+  // charts inside a closed section have no width until opened; redraw on open
+  document.addEventListener('toggle', (e) => {
+    if (!e.target.open) return;
+    window.dispatchEvent(new Event('resize'));
+    if (e.target.closest('#callcentre') && window.ccRedraw) window.ccRedraw();
+    if (e.target.closest('#payments') && window.pyRedraw) window.pyRedraw();
+  }, true);
 })();
 </script>
 <script>

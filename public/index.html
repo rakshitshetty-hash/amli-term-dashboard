@@ -392,6 +392,18 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <div class="am-kpis cc-kpis" id="cc-kpis"></div>
   </section>
 
+  <section class="am-sec" id="cc-yday">
+    <h2 class="am-h2" id="cc-yd-title">Yesterday</h2>
+    <div class="am-card yd-card">
+      <div class="yd-head"><span class="yd-verdict" id="cc-yd-verdict">—</span><p class="yd-lede" id="cc-yd-lede">—</p></div>
+      <div class="yd-cols">
+        <div><div class="yd-h">What went wrong</div><ul class="yd-list" id="cc-yd-bad"></ul></div>
+        <div><div class="yd-h">What held up</div><ul class="yd-list" id="cc-yd-good"></ul></div>
+      </div>
+      <div class="yd-h" style="margin-top:14px">Check today</div><ul class="yd-list" id="cc-yd-do"></ul>
+    </div>
+  </section>
+
   <section class="am-sec">
     <h2 class="am-h2">Segments</h2>
     <p class="am-sub">Red or green when a number is meaningfully worse or better than that segment's last 7 days. Undialled = leads still open and never dialled.</p>
@@ -1341,6 +1353,16 @@ dash.calc('cream_period', {
 .am-select{font:inherit;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);padding:6px 10px;border-radius:999px}
 .am-mx tr.cc-total td{font-weight:var(--cds-font-weight-medium);background:color-mix(in srgb,var(--color-fg) 4%,var(--color-panel))}
 #callcentre .am-tip{white-space:normal;min-width:150px}
+.yd-card{display:flex;flex-direction:column;gap:12px}
+.yd-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.yd-verdict{font-size:var(--cds-font-size-body);padding:5px 12px}
+.yd-lede{margin:0;font-size:var(--cds-font-size-body);line-height:1.5;flex:1;min-width:220px}
+.yd-cols{display:grid;grid-template-columns:1.4fr 1fr;gap:var(--cds-gap-lg)}
+@media (max-width:760px){.yd-cols{grid-template-columns:1fr}}
+.yd-h{font-size:var(--cds-font-size-caption);text-transform:uppercase;letter-spacing:.06em;color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium);margin-bottom:6px}
+.yd-list{margin:0;padding-left:1.1em;font-size:var(--cds-font-size-body);line-height:1.5}
+.yd-list li{margin-bottom:6px}
+.yd-list b{font-weight:var(--cds-font-weight-medium)}
 </style>
 <script>
 window.ccInit = function () {
@@ -1492,7 +1514,65 @@ window.ccInit = function () {
 
   document.querySelectorAll('#cc-tr-metric button').forEach((b) => (b.onclick = () => { state.m = b.dataset.m; document.querySelectorAll('#cc-tr-metric button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); trend(); }));
   sel.onchange = () => { state.day = sel.value; all(); };
-  function all() { flags(); kpis(); segTable(); leak(); trend(); }
+  function yday() {
+    const day = state.day, latest = dates[dates.length - 1];
+    const n = (v) => F.num(Math.round(v)), pc = (v, d = 1) => F.pct(v, d);
+    const el = (id) => document.getElementById(id);
+    el('cc-yd-title').textContent = (day === latest ? 'Yesterday · ' : 'Day in brief · ') + d3.utcFormat('%A %-d %b')(new Date(day + 'T00:00:00Z'));
+    const r = get('Overall', day), b = (seg, k) => base(seg, day, k);
+    const bad = [], good = [], todo = []; let sev = 0;
+    const up = (s) => { sev = Math.max(sev, s); };
+    if (!r || b('Overall', 'agents') == null) { el('cc-yd-verdict').textContent = 'No baseline'; el('cc-yd-lede').textContent = 'Not enough earlier days to compare.'; ['cc-yd-bad', 'cc-yd-good', 'cc-yd-do'].forEach((i) => el(i).replaceChildren()); return; }
+    const conT = r.agents * r.conn_pa, bConT = d3.median(by('Overall').filter((x) => x.date < day).slice(-7).map((x) => x.agents * x.conn_pa));
+    const bAg = b('Overall', 'agents'), bCpa = b('Overall', 'calls_pa'), bLogin = b('Overall', 'login'), bIdle = b('Overall', 'idle_rate'), bCon = b('Overall', 'connect');
+    const system = bCpa && r.calls_pa < 0.7 * bCpa && r.login >= 0.9 * bLogin;
+    // 1. system / dialer
+    if (system) { up(2); bad.push(`<b>Dialer or system problem.</b> Agents logged in as usual (${r.login.toFixed(1)} h) but made ${n(r.calls_pa)} calls each against ${n(bCpa)}, and idle rose to ${pc(r.idle_rate, 0)}. Total connects fell to ${n(conT)} from ${n(bConT)}, about ${n(bConT - conT)} fewer conversations.`); todo.push('Confirm with the call-centre team what went down and that it\'s fixed.'); }
+    // 2. staffing
+    if (r.agents < 0.85 * bAg) { up(2); bad.push(`<b>Short-staffed:</b> ${n(r.agents)} agents against ${n(bAg)} usual (${n(bAg - r.agents)} fewer).${system ? '' : ` Total connects fell to ${n(conT)} from ${n(bConT)}.`}`); }
+    else if (r.agents < 0.92 * bAg) { up(1); bad.push(`<b>Lighter staffing:</b> ${n(r.agents)} agents against ${n(bAg)} usual.`); }
+    else good.push(`Staffing: ${n(r.agents)} agents (usual ${n(bAg)}).`);
+    // 3. productivity (if not system)
+    if (!system) {
+      if (bConT && conT < 0.85 * bConT && r.agents >= 0.85 * bAg) { up(1); bad.push(`<b>Fewer conversations:</b> ${n(conT)} connects against ${n(bConT)} usual, with normal staffing.`); }
+      else if (bConT && conT >= 0.85 * bConT) good.push(`Conversations: ${n(conT)} connects (usual ${n(bConT)}), ${F.one(r.conn_pa)} per agent.`);
+      if (bIdle != null && r.idle_rate >= bIdle + 0.05) { up(1); bad.push(`<b>Agents sat idle more:</b> ${pc(r.idle_rate, 0)} idle against ${pc(bIdle, 0)} usual, so there weren't enough leads to dial.`); }
+      else if (bIdle == null || r.idle_rate < bIdle + 0.03) good.push(`Utilisation: ${pc(r.util, 0)}, idle ${pc(r.idle_rate, 0)}.`);
+    }
+    if (bCon != null && r.connect <= bCon - 0.015 && !system) { up(1); bad.push(`<b>Connect% dipped</b> to ${pc(r.connect)} against ${pc(bCon)} usual.`); }
+    else if (bCon != null && r.connect >= bCon - 0.01) good.push(`Connect%: ${pc(r.connect)} (usual ${pc(bCon)}).`);
+    // 4. undialled leads
+    if (r.leads != null) {
+      const bU = b('Overall', 'und_pct');
+      if (r.und_pct >= 0.08 || (bU != null && r.und_pct >= bU + 0.03 && r.und_pct >= 0.05)) {
+        up(r.und_pct >= 0.08 && day !== latest ? 2 : 1);
+        const worst = SEGS.filter((s) => s !== 'Overall').map((s) => get(s, day)).filter((x) => x && x.ond != null).sort((x, y) => y.ond - x.ond).slice(0, 2);
+        bad.push(`<b>${n(r.ond)} leads never dialled</b> (${pc(r.und_pct)} of ${n(r.leads)}, usual ${pc(bU)}). ${r.ond_eve ? n(r.ond_eve) + ' came in between 7 and 9 pm.' : ''} Most were in ${worst.map((x) => `${x.seg} (${n(x.ond)})`).join(' and ')}.`);
+        todo.push(`Call back yesterday's ${n(r.ond)} undialled leads first thing, starting with ${worst[0] ? worst[0].seg : 'the largest segment'}.`);
+      } else good.push(`Lead coverage: ${pc(r.und_pct)} of ${n(r.leads)} leads left undialled (usual ${pc(bU)}).`);
+      const bC = b('Overall', 'cnd_pct');
+      if (bC != null && r.cnd_pct >= bC + 0.025) { up(1); const w = SEGS.filter((s) => s !== 'Overall').map((s) => get(s, day)).filter((x) => x && x.cnd != null).sort((x, y) => y.cnd - x.cnd)[0];
+        bad.push(`<b>More leads closed without a dial:</b> ${n(r.cnd)} (${pc(r.cnd_pct)}, usual ${pc(bC)}), led by ${w.seg} (${n(w.cnd)}).`); todo.push(`Ask why ${w.seg} closed ${n(w.cnd)} leads without dialling them.`); }
+    }
+    // 5. segment problems (non-system)
+    if (!system) for (const s of SEGS.filter((x) => x !== 'Overall')) {
+      const x = get(s, day); if (!x) continue; const ag = b(s, 'agents'), id = b(s, 'idle_rate');
+      if (ag && x.agents < 0.8 * ag && r.agents >= 0.85 * bAg) { up(1); bad.push(`<b>${s} was short:</b> ${n(x.agents)} agents against ${n(ag)} usual.`); }
+      if (x.idle_rate >= 0.25 && id != null) { up(1); bad.push(`<b>${s} had spare capacity:</b> ${pc(x.idle_rate, 0)} idle on ${F.one(x.lpa)} leads per agent.`); }
+    }
+    const sem = get('SEM Core', day), ver = get('Vernac', day);
+    if (!system && sem && ver && sem.idle_rate >= 0.22 && ver.und_pct >= 0.05) todo.push(`Move 3–4 agents from SEM Core (${pc(sem.idle_rate, 0)} idle) to Vernac (${n(ver.ond)} leads undialled).`);
+    if (day === latest && r.leads != null) todo.push('The latest day\'s undialled count includes late-evening leads still being worked; it settles in the next report.');
+    const V = sev === 2 ? ['down', 'Went bad'] : sev === 1 ? ['warn', 'Watch'] : ['up', 'Business as usual'];
+    el('cc-yd-verdict').className = 'yd-verdict am-dir ' + V[0]; el('cc-yd-verdict').textContent = V[1];
+    el('cc-yd-lede').textContent = `${n(r.agents)} agents made ${n(r.calls_pa * r.agents)} calls and ${n(conT)} connects (${pc(r.connect)} connect)${r.leads != null ? ` on ${n(r.leads)} new leads` : ''}. Usual is ${n(bAg)} agents and ${n(bConT)} connects.` + (sev === 0 ? ' Nothing moved outside its normal range.' : '');
+    const fill = (id, arr, empty) => { const ul = el(id); ul.replaceChildren(); (arr.length ? arr : [empty]).forEach((t) => { const li = document.createElement('li'); const tmp = document.createElement('div'); tmp.innerHTML = t; li.append(...tmp.childNodes); ul.append(li); }); };
+    fill('cc-yd-bad', bad, 'Nothing. Every check was within its normal range.');
+    fill('cc-yd-good', good, 'Nothing stayed in its normal range.');
+    if (!todo.length) todo.push(sev === 0 ? 'No action needed.' : 'Keep an eye on the same numbers today.');
+    fill('cc-yd-do', todo, '');
+  }
+  function all() { flags(); kpis(); yday(); segTable(); leak(); trend(); }
   chips('cc-leak-seg', 'leak', leak); chips('cc-tr-seg', 'tr', trend);
   all();
   window.ccRedraw = () => { leak(); trend(); };

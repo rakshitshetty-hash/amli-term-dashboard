@@ -222,6 +222,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button type="button" class="am-tab" role="tab" data-tab="prospecting" aria-selected="false">Prospecting</button>
     <button type="button" class="am-tab" role="tab" data-tab="callcentre" aria-selected="false">Call centre</button>
     <button type="button" class="am-tab" role="tab" data-tab="payments" aria-selected="false">Payments</button>
+    <button type="button" class="am-tab" role="tab" data-tab="insights" aria-selected="false">Insights</button>
   </nav>
 
   <section id="overview" class="am-panel" role="tabpanel">
@@ -577,6 +578,48 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   </details>
 
   </section>
+
+  <section id="insights" class="am-panel" role="tabpanel" hidden>
+    <h2 class="am-h2">Insights</h2>
+    <p class="am-sub">One day, read end to end: media → audience quality → call centre → payment → sales. Every source on this dashboard, stitched into one story.</p>
+    <div class="am-controls"><label class="am-sub" style="margin:0" for="ins-day">Day</label><select id="ins-day" class="am-select"></select><span class="am-sub" style="margin:0">against plan where there is one, and otherwise against the 7 days before it</span></div>
+    <div data-draw="ins-root"></div>
+
+    <div class="ins-hero am-card" id="ins-hero">
+      <div class="ins-kicker" id="ins-kicker">—</div>
+      <p class="ins-headline" id="ins-headline">—</p>
+      <p class="ins-break" id="ins-break"></p>
+    </div>
+
+    <div class="ins-funnel" id="ins-funnel" aria-label="Funnel stages for the selected day"></div>
+
+    <section class="am-sec">
+      <h2 class="am-h2">The story</h2>
+      <ol class="ins-story" id="ins-story"></ol>
+    </section>
+
+    <section class="am-sec">
+      <h2 class="am-h2">Who moved the number</h2>
+      <p class="am-sub">Line items against their daily sales target, biggest gaps first.</p>
+      <div class="ins-movers" id="ins-movers"></div>
+    </section>
+
+    <section class="am-sec">
+      <h2 class="am-h2">Watch next</h2>
+      <ul class="yd-list" id="ins-next"></ul>
+    </section>
+
+    <details class="am-notes">
+      <summary>How this story is built, and how far to trust it</summary>
+      <ul>
+        <li>Each stage is judged against its plan where the media plan has one (spend, leads, sales, APE), and otherwise against the median of the 7 days before. Stage colours: green on track, amber slipping, red broken.</li>
+        <li>The break point is the first stage, reading down the funnel, that's red; if none is red, the first that's amber.</li>
+        <li>This is a same-day read, not a cohort. Sales are dated by payment date and come from leads created over earlier days, so a weak lead day shows up in sales later. Call-centre contact and payments move together on the same day (correlation 0.76 over 30 days), so that link is the strongest; links between audience quality and same-day sales are directional.</li>
+        <li>Audience quality uses the cream share of all leads (10L+ income, salaried, graduate) and QL% on Meta and Google prospecting.</li>
+        <li>A stage shows "No data" when its source doesn't cover the day: the tracker starts on 1 Nov, and the call-centre and payment reports can run a day ahead of it.</li>
+      </ul>
+    </details>
+  </section>
 </div>
 
 <script>
@@ -718,7 +761,7 @@ dash.calc('cream_period', {
 <script>
 (function () {
   const show = (tab) => {
-    if (!['overview', 'daily', 'cream', 'prospecting', 'callcentre', 'payments'].includes(tab)) tab = 'overview';
+    if (!['overview', 'daily', 'cream', 'prospecting', 'callcentre', 'payments', 'insights'].includes(tab)) tab = 'overview';
     window.amState.tab = tab;
     document.querySelectorAll('.am-panel').forEach((p) => { p.hidden = p.id !== tab; });
     document.querySelectorAll('.am-tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
@@ -730,7 +773,7 @@ dash.calc('cream_period', {
     if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({block: 'start'});
   }));
   const h = (location.hash || '').replace('#', '');
-  if (['daily', 'cream', 'overview', 'prospecting', 'callcentre', 'payments'].includes(h)) show(h);
+  if (['daily', 'cream', 'overview', 'prospecting', 'callcentre', 'payments', 'insights'].includes(h)) show(h);
 })();
 </script>
 
@@ -1954,6 +1997,214 @@ window.pyCC = function () {
     if (e.target.closest('#callcentre') && window.ccRedraw) window.ccRedraw();
     if (e.target.closest('#payments') && window.pyRedraw) window.pyRedraw();
   }, true);
+})();
+</script>
+<style>
+.ins-hero{margin-top:var(--cds-gap-md);padding:var(--cds-pad-xl)}
+.ins-kicker{font-size:var(--cds-font-size-caption);letter-spacing:.08em;text-transform:uppercase;font-weight:var(--cds-font-weight-medium);color:var(--color-fg-muted)}
+.ins-kicker .am-dir{margin-right:8px;letter-spacing:0;text-transform:none;font-size:var(--cds-font-size-caption)}
+.ins-headline{font-family:var(--font-anthropic-serif);font-weight:400;font-size:clamp(22px,4vw,30px);line-height:1.25;margin:10px 0 8px;max-width:46ch}
+.ins-break{margin:0;font-size:var(--cds-font-size-body);line-height:1.55;max-width:80ch}
+.ins-break b{font-weight:var(--cds-font-weight-medium)}
+.ins-funnel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin-top:var(--cds-gap-md);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;background:var(--color-panel)}
+@media (max-width:860px){.ins-funnel{grid-template-columns:1fr}}
+.ins-stage{position:relative;padding:14px 16px 16px;border-right:1px solid var(--color-border-line);display:flex;flex-direction:column;gap:6px;min-width:0}
+.ins-stage:last-child{border-right:0}
+@media (max-width:860px){.ins-stage{border-right:0;border-bottom:1px solid var(--color-border-line)}.ins-stage:last-child{border-bottom:0}}
+.ins-stage::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:var(--cds-chart-grid)}
+.ins-stage.ok::before{background:var(--color-ok)} .ins-stage.warn::before{background:var(--color-warn)} .ins-stage.bad::before{background:var(--color-bad)}
+.ins-stage.brk{background:color-mix(in srgb,var(--color-bad) 6%,var(--color-panel))}
+.ins-stage.brk.warn{background:color-mix(in srgb,var(--color-warn) 7%,var(--color-panel))}
+.ins-step{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium)}
+.ins-step .am-dir{font-size:11px;padding:2px 8px}
+.ins-big{font-family:var(--font-anthropic-serif);font-size:24px;line-height:1.1}
+.ins-big small{font-family:var(--font-anthropic-sans);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-left:4px}
+.ins-rows{display:flex;flex-direction:column;gap:3px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ins-rows div{display:flex;justify-content:space-between;gap:8px}
+.ins-rows b{font-weight:var(--cds-font-weight-medium);color:var(--color-fg)}
+.ins-rows b.am-ok{color:var(--color-ok)} .ins-rows b.am-bad{color:var(--color-bad)} .ins-rows b.am-warn{color:var(--color-warn)}
+.ins-nodata{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ins-story{margin:0;padding:0;list-style:none;counter-reset:st;display:flex;flex-direction:column;gap:12px}
+.ins-story li{counter-increment:st;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;font-size:var(--cds-font-size-body);line-height:1.55}
+.ins-story li::before{content:counter(st);display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:var(--cds-font-weight-medium);background:var(--cds-chart-grid);color:var(--color-fg)}
+.ins-story li.bad::before{background:var(--color-bad);color:#fff} .ins-story li.warn::before{background:var(--color-warn);color:#fff} .ins-story li.ok::before{background:var(--color-ok);color:#fff}
+.ins-story b{font-weight:var(--cds-font-weight-medium)}
+.ins-movers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--cds-gap-sm)}
+.ins-mv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border:1px solid var(--color-border-line);border-radius:10px;background:var(--color-panel);font-size:var(--cds-font-size-caption)}
+.ins-mv b{font-weight:var(--cds-font-weight-medium);font-size:var(--cds-font-size-body)}
+.ins-mv .g{grid-column:1/3;height:5px;border-radius:3px;background:var(--cds-chart-grid);position:relative;overflow:hidden;margin-top:4px}
+.ins-mv .g i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.ins-mv span{color:var(--color-fg-muted)}
+</style>
+<script>
+(function () {
+  const inr = new Intl.NumberFormat('en-IN', {maximumFractionDigits: 0});
+  const n = (v) => (v == null || !isFinite(v) ? '—' : inr.format(Math.round(v)));
+  const pc = (v, d = 1) => (v == null || !isFinite(v) ? '—' : (v * 100).toFixed(d) + '%');
+  const lakh = (v) => (v == null || !isFinite(v) ? '—' : '₹' + (v / 1e5).toFixed(1) + 'L');
+  const rs = (v) => (v == null || !isFinite(v) ? '—' : '₹' + inr.format(Math.round(v)));
+  const ppt = (v) => (v == null ? '' : (v >= 0 ? '+' : '−') + Math.abs(v * 100).toFixed(1) + ' pts');
+  const rel = (v) => (v == null || !isFinite(v) ? '' : (v >= 0 ? '+' : '−') + Math.abs(v * 100).toFixed(0) + '%');
+  const R = (a, b) => (b > 0 ? a / b : null);
+  const fdl = (s) => d3.utcFormat('%A %-d %b')(new Date(s + 'T00:00:00Z'));
+  const fds = (s) => d3.utcFormat('%a %-d %b')(new Date(s + 'T00:00:00Z'));
+  const med = (a) => { const v = a.filter((x) => x != null && isFinite(x)); return v.length >= 3 ? d3.median(v) : null; };
+  const ok = (id) => { const d = dash.data(id); return d.status === 'ok' && d.data ? d.data : null; };
+  window.insState = {day: null};
+
+  function sources() {
+    const dp = ok('daily_performance') || [], dt = ok('daily_targets') || [], cs = ok('cream_share') || [];
+    const pr = ok('pr_campaign_daily') || [], cc = ok('cc_daily') || [], ch = ok('cc_hourly') || [], py = ok('pay_daily') || [];
+    const byDate = (rows, f) => { const m = new Map(); for (const r of rows) { const k = r.date || r.bdate; if (!m.has(k)) m.set(k, []); m.get(k).push(r); } return m; };
+    const media = new Map(); for (const r of dp) if (r.line_item === 'All channels') media.set(r.date, r);
+    const tgt = new Map(); for (const r of dt) if (r.line_item === 'All channels') tgt.set(r.date, r);
+    const cream = new Map(); for (const r of cs) if (r.line_item === 'All channels') cream.set(r.date, r);
+    const prd = new Map(); for (const [d, v] of byDate(pr)) prd.set(d, {spend: d3.sum(v, (r) => +r.spend), leads: d3.sum(v, (r) => +r.leads), ql: d3.sum(v, (r) => +r.ql), qqg: d3.sum(v, (r) => +r.qqg)});
+    const ccd = new Map(); for (const r of cc) if (r.seg === 'Overall') ccd.set(r.date, Object.assign({connects: r.calls_pa * r.agents * r.connect}, r));
+    const lead = new Map(); for (const r of ch) if (r.seg === 'Overall') { const o = lead.get(r.bdate) || {leads: 0, ond: 0, cnd: 0, eve: 0}; o.leads += r.leads; o.ond += r.ond; o.cnd += r.cnd; if (r.hour === 19 || r.hour === 20) o.eve += r.ond; lead.set(r.bdate, o); }
+    const pay = new Map(); for (const r of py) if (r.seg === 'Overall') pay.set(r.date, r);
+    return {dp, dt, media, tgt, cream, prd, ccd, lead, pay};
+  }
+  const prior = (map, day, f) => Array.from(map.keys()).filter((d) => d < day).sort().slice(-7).map((d) => f(map.get(d)));
+
+  function build(S, day) {
+    const st = [];
+    // 1. media
+    const m = S.media.get(day), t = S.tgt.get(day);
+    if (m && t) {
+      const la = R(m.leads, t.target_leads), sp = R(m.spend, t.target_spend), cpl = R(m.spend, m.leads), tcpl = R(t.target_spend, t.target_leads);
+      const s = la < 0.85 ? 'bad' : (la < 0.95 || (cpl && tcpl && cpl > tcpl * 1.15)) ? 'warn' : 'ok';
+      st.push({k: 'media', name: 'Media', s, big: n(m.leads), unit: 'leads', rows: [['Leads vs target', pc(la, 0), la < 0.85 ? 'bad' : la < 0.95 ? 'warn' : 'ok'], ['Spend vs plan', pc(sp, 0), ''], ['CPL', rs(cpl) + ' vs ' + rs(tcpl), cpl > tcpl * 1.15 ? 'bad' : cpl > tcpl * 1.05 ? 'warn' : 'ok']],
+        text: `<b>Media ${s === 'ok' ? 'delivered' : s === 'warn' ? 'slipped' : 'fell short'}.</b> ${lakh(m.spend)} spent (${pc(sp, 0)} of plan) bought ${n(m.leads)} leads, ${pc(la, 0)} of the day's target, at ${rs(cpl)} CPL against ${rs(tcpl)} planned${cpl > tcpl * 1.15 ? `, so each lead cost ${(100 * (cpl / tcpl - 1)).toFixed(0)}% more than planned` : ''}.`,
+        score: Math.max(0, 1 - la), short: `leads came in at ${pc(la, 0)} of target (${n(m.leads)})`});
+    } else st.push({k: 'media', name: 'Media', s: 'na'});
+    // 2. audience quality
+    const c = S.cream.get(day), p = S.prd.get(day);
+    if (c || p) {
+      const cb = c ? med(prior(S.cream, day, (x) => x.share)) : null, cv = c ? c.share : null;
+      const q = p ? R(p.ql, p.leads) : null, qb = p ? med(prior(S.prd, day, (x) => R(x.ql, x.leads))) : null;
+      const cq = p ? R(p.spend, p.qqg) : null, cqb = p ? med(prior(S.prd, day, (x) => R(x.spend, x.qqg))) : null;
+      const dC = cv != null && cb != null ? cv - cb : null, dQ = q != null && qb != null ? q - qb : null;
+      const s = (dC != null && dC <= -0.015) || (dQ != null && dQ <= -0.03) ? 'bad' : (dC != null && dC <= -0.0075) || (dQ != null && dQ <= -0.015) ? 'warn' : 'ok';
+      const parts = [];
+      if (cv != null) parts.push(`cream made up ${pc(cv)} of leads${cb != null ? ` (${ppt(dC)} against the usual ${pc(cb)})` : ''}`);
+      if (q != null) parts.push(`prospecting QL% was ${pc(q)}${qb != null ? ` (${ppt(dQ)})` : ''}, with CPQQG at ${rs(cq)}${cqb ? ` against ${rs(cqb)} usual` : ''}`);
+      st.push({k: 'quality', name: 'Audience quality', s, big: cv != null ? pc(cv) : pc(q), unit: cv != null ? 'cream' : 'QL%',
+        rows: [['Cream vs 7-day', dC != null ? ppt(dC) : '—', dC == null ? '' : dC <= -0.015 ? 'bad' : dC <= -0.0075 ? 'warn' : 'ok'], ['Prospecting QL%', q != null ? pc(q) + (dQ != null ? ' (' + ppt(dQ) + ')' : '') : '—', dQ == null ? '' : dQ <= -0.03 ? 'bad' : dQ <= -0.015 ? 'warn' : 'ok'], ['Prospecting CPQQG', rs(cq), cq && cqb ? (cq > cqb * 1.2 ? 'bad' : cq > cqb * 1.1 ? 'warn' : 'ok') : '']],
+        text: `<b>Audience quality ${s === 'ok' ? 'held' : s === 'warn' ? 'softened' : 'dropped'}.</b> ${parts.join('; ').replace(/^./, (x) => x.toUpperCase())}.`,
+        score: Math.max(0, dC != null ? -dC * 10 : 0, dQ != null ? -dQ * 5 : 0), short: `lead quality fell (${[dC != null ? 'cream ' + ppt(dC) : '', dQ != null ? 'QL% ' + ppt(dQ) : ''].filter(Boolean).join(', ')})`});
+    } else st.push({k: 'quality', name: 'Audience quality', s: 'na'});
+    // 3. call centre
+    const k = S.ccd.get(day), l = S.lead.get(day);
+    if (k) {
+      const kb = med(prior(S.ccd, day, (x) => x.connects)), ab = med(prior(S.ccd, day, (x) => x.agents)), cpb = med(prior(S.ccd, day, (x) => x.calls_pa)), lb = med(prior(S.ccd, day, (x) => x.login));
+      const sys = cpb && k.calls_pa < 0.7 * cpb && lb && k.login >= 0.9 * lb;
+      const cr = R(k.connects, kb), und = l ? R(l.ond, l.leads) : null;
+      const s = sys || cr < 0.8 || k.agents < 0.85 * ab ? 'bad' : cr < 0.9 || (und != null && und >= 0.06) ? 'warn' : 'ok';
+      const why = sys ? `a dialer or system problem: agents logged in as usual but made ${n(k.calls_pa)} calls each against ${n(cpb)}` : k.agents < 0.85 * ab ? `short staffing: ${n(k.agents)} agents against ${n(ab)} usual` : '';
+      st.push({k: 'contact', name: 'Call centre', s, big: n(k.connects), unit: 'connects', rows: [['Connects vs 7-day', rel(cr - 1), cr < 0.8 ? 'bad' : cr < 0.9 ? 'warn' : 'ok'], ['Agents', n(k.agents) + ' / ' + n(ab), k.agents < 0.85 * ab ? 'bad' : ''], ['Leads never dialled', und != null ? pc(und) : '—', und == null ? '' : und >= 0.08 ? 'bad' : und >= 0.05 ? 'warn' : 'ok']],
+        text: `<b>Call centre ${s === 'ok' ? 'kept up' : s === 'warn' ? 'lost some ground' : 'broke'}.</b> ${n(k.connects)} connects against ${n(kb)} usual${why ? ', because of ' + why : ''}. Connect% was ${pc(k.connect)}.${l ? ` ${n(l.ond)} leads (${pc(und)}) were never dialled${l.eve ? `, ${n(l.eve)} of them from the 7–9 pm window` : ''}.` : ''}`, sys, why,
+        score: sys ? 1 : Math.max(0, 1 - cr, und != null ? (und - 0.04) * 2 : 0), short: `the call centre had ${n(k.connects)} conversations against ${n(kb)} usual${why ? ' (' + why.split(':')[0] + ')' : ''}`});
+    } else st.push({k: 'contact', name: 'Call centre', s: 'na'});
+    // 4. payment
+    const y = S.pay.get(day);
+    if (y) {
+      const tb = med(prior(S.pay, day, (x) => x.tx)), sb = med(prior(S.pay, day, (x) => R(x.ok, x.tx))), sv = R(y.ok, y.tx), ur = R(y.upi_ok, y.upi_a), ub = med(prior(S.pay, day, (x) => R(x.upi_ok, x.upi_a)));
+      const vr = R(y.tx, tb), ds = sv - sb;
+      const s = vr < 0.8 || ds <= -0.03 ? 'bad' : vr < 0.9 || ds <= -0.015 ? 'warn' : 'ok';
+      st.push({k: 'payment', name: 'Payment', s, big: n(y.ok), unit: 'paid', rows: [['Attempts vs 7-day', rel(vr - 1), vr < 0.8 ? 'bad' : vr < 0.9 ? 'warn' : 'ok'], ['Success', pc(sv) + ' (' + ppt(ds) + ')', ds <= -0.03 ? 'bad' : ds <= -0.015 ? 'warn' : 'ok'], ['UPI success', pc(ur), ur != null && ub != null ? (ur <= ub - 0.03 ? 'bad' : 'ok') : '']],
+        text: `<b>Payments ${s === 'ok' ? 'went through' : s === 'warn' ? 'wobbled' : 'broke'}.</b> ${n(y.tx)} payment attempts against ${n(tb)} usual, and ${pc(sv)} succeeded (${ppt(ds)}). ${ur != null && ub != null && ur <= ub - 0.03 ? `UPI was the weak spot at ${pc(ur)} against ${pc(ub)}.` : `${n(y.tx - y.ok)} attempts failed, ${n(y.upi_a - y.upi_ok)} of them on UPI.`}`, ok: y.ok, okb: med(prior(S.pay, day, (x) => x.ok)),
+        score: Math.max(0, 1 - vr) + Math.max(0, -ds) * 5, short: `payments ${vr < 0.9 ? `fell to ${n(y.tx)} attempts against ${n(tb)} usual` : ''}${vr < 0.9 && ds <= -0.015 ? ' and ' : ''}${ds <= -0.015 ? `success dropped to ${pc(sv)} (${ppt(ds)})` : ''}`});
+    } else st.push({k: 'payment', name: 'Payment', s: 'na'});
+    // 5. sales
+    if (m && t) {
+      const sa = R(m.sales, t.target_sales), aa = R(m.ape, t.target_ape), cvr = R(m.sales, m.leads), cvb = med(prior(S.media, day, (x) => R(x.sales, x.leads)));
+      const s = sa < 0.85 ? 'bad' : sa < 0.95 ? 'warn' : 'ok';
+      st.push({k: 'sales', name: 'Sales', s, big: n(m.sales), unit: 'sales', rows: [['Sales vs target', pc(sa, 0), s], ['APE vs target', pc(aa, 0), aa < 0.85 ? 'bad' : aa < 0.95 ? 'warn' : 'ok'], ['CVR', pc(cvr, 2) + (cvb != null ? ' / ' + pc(cvb, 2) : ''), cvb != null ? (cvr < cvb * 0.85 ? 'bad' : cvr < cvb * 0.95 ? 'warn' : 'ok') : '']],
+        sa, aa, cvr, cvb, text: `<b>Sales ${s === 'ok' ? 'landed on plan' : s === 'warn' ? 'came in slightly short' : 'missed'}.</b> ${n(m.sales)} sales against ${n(t.target_sales)} targeted (${pc(sa, 0)}), and ${lakh(m.ape)} APE (${pc(aa, 0)} of target). CVR was ${pc(cvr, 2)}${cvb != null ? ` against ${pc(cvb, 2)} on recent days` : ''}.`});
+    } else st.push({k: 'sales', name: 'Sales', s: 'na'});
+    return st;
+  }
+
+  function render(el) {
+    const S = sources();
+    const dates = Array.from(new Set([...S.media.keys(), ...S.ccd.keys(), ...S.pay.keys()])).filter((d) => d >= (d3.min(Array.from(S.media.keys())) || '9999')).sort();
+    const sel = document.getElementById('ins-day');
+    if (!dates.length) { document.getElementById('ins-headline').textContent = 'Loading the sources…'; return; }
+    const covered = (d) => [S.media.has(d), S.ccd.has(d), S.pay.has(d), S.cream.has(d) || S.prd.has(d)].filter(Boolean).length;
+    if (!window.insState.day || !dates.includes(window.insState.day)) window.insState.day = dates.slice().reverse().find((d) => covered(d) >= 4) || dates[dates.length - 1];
+    sel.replaceChildren(...dates.slice().reverse().map((d) => new Option(fds(d) + (S.media.has(d) ? '' : ' · partial'), d)));
+    sel.value = window.insState.day;
+    sel.onchange = () => { window.insState.day = sel.value; dash.draw('ins-root'); };
+    const day = window.insState.day, st = build(S, day);
+    const sales = st.find((x) => x.k === 'sales'), up = st.filter((x) => x.k !== 'sales');
+    const cand = up.filter((x) => x.s !== 'na' && x.s !== 'ok' && (x.score || 0) >= 0.08).sort((a, b) => b.score - a.score);
+    const brk = cand[0] || null;
+    const pay = st.find((x) => x.k === 'payment');
+    const divergent = sales && sales.s !== 'na' && sales.s !== 'ok' && pay && pay.s !== 'na' && pay.okb && pay.ok >= 0.9 * pay.okb;
+    // hero
+    const verdict = !sales || sales.s === 'na' ? ['flat', 'Partial day'] : sales.s === 'ok' ? ['up', 'On plan'] : sales.s === 'warn' ? ['warn', 'Slightly short'] : ['down', 'Short of plan'];
+    const kick = document.getElementById('ins-kicker'); kick.replaceChildren(Object.assign(document.createElement('span'), {className: 'am-dir ' + verdict[0], textContent: verdict[1]}), document.createTextNode(fdl(day)));
+    let head, why;
+    if (sales && sales.s !== 'na') {
+      head = sales.s === 'ok' ? `The funnel held: ${sales.big} sales, ${pc(sales.sa, 0)} of target.` : divergent ? `Sales landed at ${pc(sales.sa, 0)} of target, but payments look normal. Check the sales feed first.` : brk ? `Sales landed at ${pc(sales.sa, 0)} of target. The funnel broke at ${brk.name.toLowerCase()}.` : divergent ? `Sales landed at ${pc(sales.sa, 0)} of target, but payments look normal.` : `Sales landed at ${pc(sales.sa, 0)} of target, with no single stage broken.`;
+      if (sales.s === 'ok') why = brk ? `It held even though ${brk.short}.` : 'Every stage stayed in its normal range.';
+      else if (brk) why = `<b>What broke:</b> ${brk.short}.` + (brk.k === 'contact' && pay && pay.s !== 'ok' ? ' Payments fell with it on the same day, so this is the most likely cause of the miss.' : brk.k === 'contact' ? ' Payments held up, though, so it explains only part of the miss.' : brk.k === 'quality' ? ' Weaker leads show up in sales over the next days as much as today; watch CVR tomorrow.' : brk.k === 'media' ? ' Fewer or costlier leads narrow the top of the funnel for the coming days.' : '');
+      else why = 'Every upstream stage was within range, so the gap is likely lag from earlier days\' leads or spread thinly across line items. See who moved the number below.';
+      if (divergent) why += ` <b>Check the sales feed:</b> the payment report shows ${n(pay.ok)} successful payments, ${pay.ok >= pay.okb * 1.1 ? 'above' : 'in line with'} the usual ${n(pay.okb)}, while the tracker shows ${sales.big} sales. Part of this gap may be sales not yet booked for this date.`;
+      const med0 = st.find((x) => x.k === 'media'); if (!divergent && sales.cvb && sales.cvr < sales.cvb * 0.85 && med0 && med0.s !== 'na' && med0.score < 0.05) why += ` CVR was ${pc(sales.cvr, 2)} against ${pc(sales.cvb, 2)} recently, so this is a conversion problem more than a volume one.`;
+    } else {
+      head = brk ? `Sales data isn't in yet. Upstream, ${brk.name.toLowerCase()} ${brk.s === 'bad' ? 'broke' : 'slipped'}.` : `Sales data isn't in yet. Every stage that has data looked normal.`;
+      why = brk ? brk.text : 'Read the full day once the lead and sales dumps for this date are processed.';
+    }
+    document.getElementById('ins-headline').textContent = head;
+    const bp = document.getElementById('ins-break'); bp.innerHTML = why;
+    // funnel
+    const fu = document.getElementById('ins-funnel'); fu.replaceChildren();
+    const lab = {ok: ['up', 'On track'], warn: ['warn', 'Slipping'], bad: ['down', 'Broke'], na: ['flat', 'No data']};
+    st.forEach((x, i) => {
+      const c = document.createElement('div'); c.className = 'ins-stage ' + (x.s === 'na' ? '' : x.s) + (brk && x === brk ? ' brk' : '');
+      const h = document.createElement('div'); h.className = 'ins-step'; h.append(Object.assign(document.createElement('span'), {textContent: (i + 1) + ' · ' + x.name}), Object.assign(document.createElement('span'), {className: 'am-dir ' + lab[x.s][0], textContent: lab[x.s][1]}));
+      c.append(h);
+      if (x.s === 'na') { c.append(Object.assign(document.createElement('div'), {className: 'ins-nodata', textContent: 'The source doesn\'t cover this day.'})); fu.append(c); return; }
+      const b = document.createElement('div'); b.className = 'ins-big'; b.textContent = x.big; b.append(Object.assign(document.createElement('small'), {textContent: x.unit})); c.append(b);
+      const rw = document.createElement('div'); rw.className = 'ins-rows';
+      for (const [k2, v, t2] of x.rows) { const d = document.createElement('div'); d.append(Object.assign(document.createElement('span'), {textContent: k2}), Object.assign(document.createElement('b'), {textContent: v, className: t2 ? 'am-' + t2 : ''})); rw.append(d); }
+      c.append(rw); fu.append(c);
+    });
+    // story
+    const ol = document.getElementById('ins-story'); ol.replaceChildren();
+    for (const x of st) { if (x.s === 'na') continue; const li = document.createElement('li'); li.className = x.s; const sp = document.createElement('span'); sp.innerHTML = x.text; li.append(sp); ol.append(li); }
+    if (sales && sales.s !== 'na' && sales.s !== 'ok') {
+      const li = document.createElement('li'); li.className = 'bad'; const sp = document.createElement('span');
+      sp.innerHTML = divergent ? `<b>So the day's story:</b> the funnel ran mostly to plan up to payment${brk ? ` (the weak spot was that ${brk.short})` : ''}, and payments went through, so the sales shortfall needs checking against the sales feed before anyone acts on it.` : brk ? `<b>So the day's story:</b> ${brk.short}, and the stages after it inherited the gap, ending at ${pc(sales.sa, 0)} of the sales target.` : divergent ? `<b>So the day's story:</b> nothing upstream broke and payments went through, so check whether this date's sales are fully booked before acting.` : `<b>So the day's story:</b> no stage broke on its own; the miss is spread, or carried over from earlier days.`;
+      li.append(sp); ol.append(li);
+    }
+    // movers
+    const mv = document.getElementById('ins-movers'); mv.replaceChildren();
+    const items = S.dp.filter((r) => r.date === day && r.line_item !== 'All channels').map((r) => { const tt = S.dt.find((q) => q.date === day && q.line_item === r.line_item) || {}; return {li: r.line_item, sales: +r.sales, tgt: +tt.target_sales || 0, ape: +r.ape, tape: +tt.target_ape || 0}; }).filter((r) => r.tgt >= 1).sort((a, b) => (a.sales - a.tgt) - (b.sales - b.tgt));
+    if (!items.length) mv.append(Object.assign(document.createElement('p'), {className: 'am-sub', textContent: 'No line-item sales for this day yet.'}));
+    for (const r of items) {
+      const a = R(r.sales, r.tgt), c = document.createElement('div'); c.className = 'ins-mv';
+      c.append(Object.assign(document.createElement('b'), {textContent: r.li}), Object.assign(document.createElement('b'), {textContent: (r.sales - r.tgt >= 0 ? '+' : '−') + n(Math.abs(r.sales - r.tgt)), className: r.sales - r.tgt >= 0 ? 'am-ok' : 'am-bad'}),
+        Object.assign(document.createElement('span'), {textContent: `${n(r.sales)} sales of ${n(r.tgt)} · APE ${lakh(r.ape)} of ${lakh(r.tape)}`}), Object.assign(document.createElement('span'), {textContent: pc(a, 0)}));
+      const g = document.createElement('div'); g.className = 'g'; const i = document.createElement('i'); i.style.width = Math.min(100, a * 100) + '%'; i.style.background = a >= 1 ? 'var(--color-ok)' : a >= 0.9 ? 'var(--color-warn)' : 'var(--color-bad)'; g.append(i); c.append(g); mv.append(c);
+    }
+    // next
+    const nx = document.getElementById('ins-next'); nx.replaceChildren(); const next = [];
+    const get = (k) => st.find((x) => x.k === k);
+    if (get('contact').s === 'bad') next.push(get('contact').sys ? 'Confirm the dialer issue is fixed, and that the day\'s unpaid quotes are called back first.' : 'Get staffing back to normal and call back the day\'s undialled leads first.');
+    else if (get('contact').s === 'warn') next.push('Clear the undialled backlog, starting with the 7–9 pm leads.');
+    if (get('quality').s !== 'ok' && get('quality').s !== 'na') next.push('Check which line items pulled cream share and QL% down (Cream audience and Prospecting tabs), and hold their budgets until quality recovers.');
+    if (get('media').s === 'bad') next.push('Leads came in under target: check pacing and CPL by line item on the Day on day tab.');
+    if (divergent) next.push('Re-check this date\'s sales once the next sales dump lands; the payment report suggests more sales than the tracker shows.');
+    if (get('payment').s === 'bad' && get('contact').s === 'ok') next.push('Payments broke while the call centre was fine: ask for payment failure codes and check the checkout page.');
+    if (get('sales').s !== 'ok' && get('sales').s !== 'na' && items[0] && items[0].sales < items[0].tgt) next.push(`${items[0].li} was the biggest single gap (${n(items[0].tgt - items[0].sales)} sales short); start the review there.`);
+    if (!next.length) next.push('Nothing to chase. Keep the same mix and watch tomorrow for lagged effects of today\'s leads.');
+    next.forEach((t2) => nx.append(Object.assign(document.createElement('li'), {textContent: t2})));
+  }
+
+  dash.draw('ins-root', (el) => render(el));
 })();
 </script>
 <script>

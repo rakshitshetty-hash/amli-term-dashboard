@@ -1,6 +1,6 @@
 # AMLI Term – daily performance dashboard
 
-A static site with three tabs (Overview, Day on day, Cream audience). Vercel serves `public/`. The page reads `public/data.json`, which `scripts/process.py` rebuilds each day.
+A static site with four tabs (Overview, Day on day, Cream audience, Prospecting). Vercel serves `public/`. The first three tabs read `public/data.json`, which `scripts/process.py` rebuilds each day. The Prospecting tab reads `public/prospecting.json`, which `scripts/prospecting.py` builds from the GA4 consolidated report.
 
 ## Daily update
 
@@ -19,6 +19,16 @@ A static site with three tabs (Overview, Day on day, Cream audience). Vercel ser
 3. Commit and push. Vercel redeploys on every push to `main`.
 
 `process.py` prints the as-of date, totals, and any source codes the mapping doesn't cover. Add those to `config/mapping.xlsx` (the Master Tracker mapping) and run it again.
+
+## Prospecting tab update
+
+When a new AMLI GA4 Term Consolidated Report (`.xlsb`) lands, run:
+
+```
+python3 scripts/prospecting.py --report <GA4 consolidated .xlsb> --out public/prospecting.json
+```
+
+Then commit and push. The tab covers Meta and Google rows with Theme1 = Prospecting and shows CPL (Spend ÷ Leads), QL% (QL ÷ Leads) and CPQQG (Spend ÷ QQ-G), MTD against the same days last month. Creative attributes (format, partner, language, creator type, launch date) are read from the Meta ad naming convention. The "What to do" list is worked out on the page: line items against their channel's CPQQG (Efficient ≤ 0.9×, Expensive ≥ 1.2×), Meta ads with ₹1L+ spend in the last 14 days against the Meta CPQQG (Scale ≤ 0.8×, Pause ≥ 1.5× or no QQ-G).
 
 ## Monthly update
 

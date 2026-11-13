@@ -188,6 +188,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button type="button" class="am-tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
     <button type="button" class="am-tab" role="tab" data-tab="daily" aria-selected="false">Day on day</button>
     <button type="button" class="am-tab" role="tab" data-tab="cream" aria-selected="false">Cream audience</button>
+    <button type="button" class="am-tab" role="tab" data-tab="prospecting" aria-selected="false">Prospecting</button>
   </nav>
 
   <section id="overview" class="am-panel" role="tabpanel">
@@ -296,6 +297,78 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <h2 class="am-h2">Cream share by day</h2>
       <p class="am-sub">Each cell is that day's cream share, coloured by how close it came to the line item's best day: green at 95% of best or more, amber at 85–95%, red below 85%.</p>
       <div class="am-mx-wrap" data-draw="cream-heat" data-source="cream_share cream_period"></div>
+    </div>
+  </section>
+
+  <section id="prospecting" class="am-panel" role="tabpanel" hidden>
+    <h2 class="am-h2">Prospecting · Meta + Google</h2>
+    <p class="am-sub">MTD <span data-draw="pr-win" data-field="mtd">—</span> vs LMTD <span data-draw="pr-win" data-field="lmtd">—</span> · CPL = Spend ÷ Leads · QL% = QL ÷ Leads · CPQQG = Spend ÷ QQ-G · from the GA4 consolidated report, data through <span data-draw="pr-win" data-field="asof">—</span></p>
+    <p class="am-lede">Prospecting CPQQG is <b data-draw="pr-lede" data-field="cpqqg" data-ch="Total">—</b> MTD (<b data-draw="pr-lede" data-field="cpqqg_chg" data-ch="Total">—</b>). Meta <b data-draw="pr-lede" data-field="cpqqg" data-ch="Meta">—</b> (<b data-draw="pr-lede" data-field="cpqqg_chg" data-ch="Meta">—</b>), Google <b data-draw="pr-lede" data-field="cpqqg" data-ch="Google">—</b> (<b data-draw="pr-lede" data-field="cpqqg_chg" data-ch="Google">—</b>).</p>
+
+    <div class="am-chips" role="group" aria-label="Channel" id="pr-ch">
+      <button type="button" class="am-chip" data-ch="Total" aria-pressed="true">Total</button>
+      <button type="button" class="am-chip" data-ch="Meta" aria-pressed="false">Meta</button>
+      <button type="button" class="am-chip" data-ch="Google" aria-pressed="false">Google</button>
+    </div>
+    <div class="am-kpis pr-kpis" id="pr-kpis">
+      <div class="am-card am-kpi"><div class="am-kpi-label">Spend</div><div class="am-kpi-val" data-draw="pr-kpi" data-field="spend">—</div><div class="am-kpi-meta" data-draw="pr-kpi-meta" data-field="spend">—</div></div>
+      <div class="am-card am-kpi"><div class="am-kpi-label">Leads</div><div class="am-kpi-val" data-draw="pr-kpi" data-field="leads">—</div><div class="am-kpi-meta" data-draw="pr-kpi-meta" data-field="leads">—</div></div>
+      <div class="am-card am-kpi"><div class="am-kpi-label">CPL</div><div class="am-kpi-val" data-draw="pr-kpi" data-field="cpl">—</div><div class="am-kpi-meta" data-draw="pr-kpi-meta" data-field="cpl">—</div></div>
+      <div class="am-card am-kpi"><div class="am-kpi-label">QL%</div><div class="am-kpi-val" data-draw="pr-kpi" data-field="qlp">—</div><div class="am-kpi-meta" data-draw="pr-kpi-meta" data-field="qlp">—</div></div>
+      <div class="am-card am-kpi"><div class="am-kpi-label">QQ-G</div><div class="am-kpi-val" data-draw="pr-kpi" data-field="qqg">—</div><div class="am-kpi-meta" data-draw="pr-kpi-meta" data-field="qqg">—</div></div>
+      <div class="am-card am-kpi"><div class="am-kpi-label">CPQQG</div><div class="am-kpi-val" data-draw="pr-kpi" data-field="cpqqg">—</div><div class="am-kpi-meta" data-draw="pr-kpi-meta" data-field="cpqqg">—</div></div>
+    </div>
+    <div class="am-card" style="margin-top:var(--cds-gap-md)">
+      <div class="am-chart-head"><div class="am-chart-title">Day on day · this month vs last month</div>
+        <div class="am-seg" role="group" aria-label="Metric" id="pr-ov-metric"><button type="button" data-m="cpqqg" aria-pressed="true">CPQQG</button><button type="button" data-m="cpl" aria-pressed="false">CPL</button><button type="button" data-m="qlp" aria-pressed="false">QL%</button></div>
+      </div>
+      <div class="am-legend"><span><i style="background:var(--am-accent)"></i>This month</span><span><i style="background:var(--cds-chart-reference)"></i>Last month, same day</span><span>The latest day reads high until its QQ-G comes in.</span></div>
+      <div class="am-chart pr-chart" data-draw="pr-ov-chart"></div>
+    </div>
+
+    <div class="am-sec" id="pr-actions">
+      <h2 class="am-h2">What to do</h2>
+      <p class="am-sub">Worked out from the numbers on this tab: line items against their channel's CPQQG, creatives against the Meta average over the last 14 days.</p>
+      <div class="am-card"><ul class="pr-acts" data-draw="pr-actions"></ul></div>
+    </div>
+
+    <div class="am-sec" id="pr-lines">
+      <h2 class="am-h2">Line items</h2>
+      <p class="am-sub">MTD, with change vs LMTD. Status compares CPQQG with the channel's: Efficient ≤ 0.9×, Expensive ≥ 1.2×. Tap a row for its day-on-day trend.</p>
+      <div class="am-chips" role="group" aria-label="Channel" id="pr-li-ch">
+        <button type="button" class="am-chip" data-ch="Meta" aria-pressed="true">Meta</button>
+        <button type="button" class="am-chip" data-ch="Google" aria-pressed="false">Google</button>
+      </div>
+      <div class="am-mx-wrap" data-draw="pr-camps"></div>
+      <div class="am-card" style="margin-top:var(--cds-gap-md)">
+        <div class="am-chart-head"><div class="am-chart-title" data-draw="pr-li-title">—</div>
+          <div class="am-seg" role="group" aria-label="Metric" id="pr-li-metric"><button type="button" data-m="cpqqg" aria-pressed="true">CPQQG</button><button type="button" data-m="cpl" aria-pressed="false">CPL</button><button type="button" data-m="qlp" aria-pressed="false">QL%</button><button type="button" data-m="spend" aria-pressed="false">Spend</button></div>
+        </div>
+        <div class="am-legend"><span><i style="background:var(--am-accent)"></i>Line item</span><span><i style="background:var(--cds-chart-reference)"></i>Channel</span></div>
+        <div class="am-chart pr-chart" data-draw="pr-li-chart"></div>
+      </div>
+    </div>
+
+    <div class="am-sec" id="pr-creatives">
+      <h2 class="am-h2">Meta creatives · last 14 days</h2>
+      <p class="am-sub">Ads with ₹1L+ spend, <span data-draw="pr-win" data-field="l14">—</span>. Meta CPQQG over the period: <b data-draw="pr-adavg">—</b>. Scale ≤ 0.8× that, Pause ≥ 1.5× or no QQ-G.</p>
+      <div class="am-controls"><div class="am-seg" role="group" aria-label="View" id="pr-cr-view"><button type="button" data-v="Scale" aria-pressed="true">Top performers</button><button type="button" data-v="Pause" aria-pressed="false">Pause</button><button type="button" data-v="all" aria-pressed="false">All ₹1L+</button></div></div>
+      <div class="am-mx-wrap" data-draw="pr-ads"></div>
+      <div class="am-card" style="margin-top:var(--cds-gap-md)"><div class="am-chart-title" style="margin-bottom:6px">Why the top performers work</div><ul class="pr-acts" data-draw="pr-traits"></ul></div>
+    </div>
+
+    <div class="am-sec" id="pr-format">
+      <h2 class="am-h2">Meta video vs static · day on day</h2>
+      <p class="am-sub" data-draw="pr-fmt-sub">—</p>
+      <div class="am-card">
+        <div class="am-legend"><span><i style="background:var(--am-accent)"></i>Video</span><span><i style="background:#c46a2b"></i>Static</span></div>
+        <div class="am-chart-title">Share of Meta spend</div>
+        <div class="am-chart pr-chart sm" data-draw="pr-fmt-share"></div>
+        <div class="am-chart-head" style="margin-top:var(--cds-gap-md)"><div class="am-chart-title">Efficiency</div>
+          <div class="am-seg" role="group" aria-label="Metric" id="pr-fmt-metric"><button type="button" data-m="cpqqg" aria-pressed="true">CPQQG</button><button type="button" data-m="cpl" aria-pressed="false">CPL</button><button type="button" data-m="qlp" aria-pressed="false">QL%</button></div>
+        </div>
+        <div class="am-chart pr-chart sm" data-draw="pr-fmt-chart"></div>
+      </div>
     </div>
   </section>
 </div>
@@ -439,7 +512,7 @@ dash.calc('cream_period', {
 <script>
 (function () {
   const show = (tab) => {
-    if (!['overview', 'daily', 'cream'].includes(tab)) tab = 'overview';
+    if (!['overview', 'daily', 'cream', 'prospecting'].includes(tab)) tab = 'overview';
     window.amState.tab = tab;
     document.querySelectorAll('.am-panel').forEach((p) => { p.hidden = p.id !== tab; });
     document.querySelectorAll('.am-tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
@@ -451,7 +524,7 @@ dash.calc('cream_period', {
     if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({block: 'start'});
   }));
   const h = (location.hash || '').replace('#', '');
-  if (['daily', 'cream', 'overview'].includes(h)) show(h);
+  if (['daily', 'cream', 'overview', 'prospecting'].includes(h)) show(h);
 })();
 </script>
 
@@ -842,11 +915,354 @@ dash.calc('cream_period', {
 </script>
 <div class="am-foot">Prepared by HiveMinds · Refreshed daily</div>
 </div>
+<style>
+.pr-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){.pr-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pr-chart{min-height:220px}
+.pr-chart.sm{min-height:170px}
+.pr-acts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:var(--cds-font-size-body);line-height:1.45}
+.pr-acts li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:baseline;overflow-wrap:anywhere}
+.pr-acts li.pr-plain{display:block}
+.pr-acts .am-dir{text-align:center}
+.pr-cr b{display:block;font-weight:var(--cds-font-weight-medium);max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.pr-cr span{color:var(--color-fg-muted)}
+.am-mx td.pr-l,.am-mx th.pr-l{text-align:left}
+.am-mx tr.pr-sel td{background:color-mix(in srgb,var(--am-accent) 10%,var(--color-panel))}
+.am-mx tbody tr.pr-click{cursor:pointer}
+</style>
 <script>
-fetch('data.json', {cache: 'no-store'})
+(function () {
+  const S = (v, k) => v.reduce((a, r) => a + (+r[k] || 0), 0);
+  const D = (x, y) => (y > 0 ? x / y : null);
+  const chg = (a, b) => (a != null && b ? a / b - 1 : null);
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const need = (...xs) => xs.every((x) => x != null);
+  const agg = (v) => { const o = {spend: S(v, 'spend'), leads: S(v, 'leads'), ql: S(v, 'ql'), qqg: S(v, 'qqg')}; o.cpl = D(o.spend, o.leads); o.qlp = D(o.ql, o.leads); o.cpqqg = D(o.spend, o.qqg); return o; };
+  window.prAgg = agg;
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  window.prLabel = (c) => {
+    let t = String(c).replace(/^(WC_)?FB_OTP_PR_/, '').split('_');
+    let when = '';
+    if (/^\d{8}$/.test(t[t.length - 1])) { const d = t.pop(); when = ' · ' + (+d.slice(0, 2)) + ' ' + MON[+d.slice(2, 4) - 1] + ' ' + d.slice(6, 8); }
+    return t.filter((x) => !['All', 'Both', '2545', '2565'].includes(x)).join(' ') + when;
+  };
+
+  dash.calc('pr_win', {title: 'Prospecting windows', description: 'MTD = 1st of the latest month to the latest day; LMTD = the same days of the previous month; L14 = the last 14 days.',
+    inputs: ['pr_meta'], fn: (meta) => {
+      if (!need(meta)) return null;
+      const last = new Date(meta.as_of + 'T00:00:00Z'), d = last.getUTCDate();
+      const m0 = new Date(Date.UTC(last.getUTCFullYear(), last.getUTCMonth(), 1));
+      const p0 = new Date(Date.UTC(last.getUTCFullYear(), last.getUTCMonth() - 1, 1));
+      const pEnd = new Date(Date.UTC(p0.getUTCFullYear(), p0.getUTCMonth(), Math.min(d, new Date(Date.UTC(p0.getUTCFullYear(), p0.getUTCMonth() + 1, 0)).getUTCDate())));
+      return {as_of: meta.as_of, mtd_start: iso(m0), mtd_end: meta.as_of, lmtd_start: iso(p0), lmtd_end: iso(pEnd), l14_start: meta.l14_start, p14_start: meta.p14_start};
+    }});
+
+  dash.calc('pr_kpi', {title: 'Prospecting KPIs, MTD vs LMTD', description: 'Spend, leads, CPL, QL%, QQ-G and CPQQG for Total, Meta and Google, MTD and LMTD.',
+    inputs: ['pr_campaign_daily', 'pr_win'], fn: (cd, w) => {
+      if (!need(cd, w)) return null;
+      return ['Total', 'Meta', 'Google'].map((ch) => {
+        const mine = cd.filter((r) => ch === 'Total' || r.channel === ch);
+        const n = agg(mine.filter((r) => r.date >= w.mtd_start && r.date <= w.mtd_end)), o = agg(mine.filter((r) => r.date >= w.lmtd_start && r.date <= w.lmtd_end));
+        const out = {channel: ch};
+        for (const k of ['spend', 'leads', 'cpl', 'qlp', 'qqg', 'cpqqg']) { out[k] = n[k]; out[k + '_o'] = o[k]; out[k + '_chg'] = k === 'qlp' ? (n[k] != null && o[k] != null ? n[k] - o[k] : null) : chg(n[k], o[k]); }
+        return out;
+      });
+    }});
+
+  dash.calc('pr_dom', {title: 'Prospecting by day of month', description: 'Daily CPL, QL% and CPQQG for Total, Meta and Google, this month and last month, by day of month.',
+    inputs: ['pr_campaign_daily', 'pr_win'], fn: (cd, w) => {
+      if (!need(cd, w)) return null;
+      const out = [];
+      for (const ch of ['Total', 'Meta', 'Google']) for (const [per, a] of [['cur', w.mtd_start], ['prev', w.lmtd_start]]) {
+        const ym = a.slice(0, 7);
+        const mine = cd.filter((r) => r.date.slice(0, 7) === ym && (ch === 'Total' || r.channel === ch));
+        for (const [date, v] of d3.group(mine, (r) => r.date)) out.push(Object.assign({channel: ch, per, day: +date.slice(8, 10), date}, agg(v)));
+      }
+      return out.sort((a, b) => a.day - b.day);
+    }});
+
+  dash.calc('pr_camp', {title: 'Prospecting line items, MTD vs LMTD', description: 'Each campaign: MTD spend, share of channel spend, leads, CPL, QL%, QQ-G, CPQQG; change vs LMTD; status against the channel CPQQG.',
+    inputs: ['pr_campaign_daily', 'pr_win'], fn: (cd, w) => {
+      if (!need(cd, w)) return null;
+      const N = cd.filter((r) => r.date >= w.mtd_start && r.date <= w.mtd_end), O = cd.filter((r) => r.date >= w.lmtd_start && r.date <= w.lmtd_end);
+      const chN = {Meta: agg(N.filter((r) => r.channel === 'Meta')), Google: agg(N.filter((r) => r.channel === 'Google'))};
+      const out = [];
+      for (const [cmp, v] of d3.group(N, (r) => r.campaign)) {
+        const n = agg(v), o = agg(O.filter((r) => r.campaign === cmp)), ch = v[0].channel, cc = chN[ch];
+        const ratio = n.cpqqg && cc.cpqqg ? n.cpqqg / cc.cpqqg : null;
+        out.push({campaign: cmp, channel: ch, label: window.prLabel(cmp), spend: n.spend, share: D(n.spend, cc.spend), leads: n.leads,
+          cpl: n.cpl, cpl_chg: chg(n.cpl, o.cpl), qlp: n.qlp, qlp_chg: n.qlp != null && o.qlp != null ? n.qlp - o.qlp : null, qqg: n.qqg,
+          cpqqg: n.cpqqg, cpqqg_o: o.cpqqg, cpqqg_chg: chg(n.cpqqg, o.cpqqg), spend_chg: chg(n.spend, o.spend), ratio,
+          status: ratio == null ? 'No QQ-G' : ratio <= 0.9 ? 'Efficient' : ratio >= 1.2 ? 'Expensive' : 'On par'});
+      }
+      return out.sort((a, b) => b.spend - a.spend);
+    }});
+
+  dash.calc('pr_ads', {title: 'Meta ads, last 14 days', description: 'Meta prospecting ads with ₹1L+ spend in the last 14 days: CPL, QL%, QQ-G and CPQQG vs the 14 days before; Scale ≤ 0.8× the Meta CPQQG, Pause ≥ 1.5× or no QQ-G.',
+    inputs: ['pr_meta_ads'], fn: (ads) => {
+      if (!need(ads)) return null;
+      const avg = D(S(ads, 'spend_l14'), S(ads, 'qqg_l14'));
+      return ads.filter((r) => +r.spend_l14 >= 100000).map((r) => {
+        const cp = D(+r.spend_l14, +r.qqg_l14);
+        return {ad: r.ad, hook: r.hook, partner: r.partner, format: r.format, language: r.language, creator: r.creator, launch: r.launch,
+          spend: +r.spend_l14, cpl: D(+r.spend_l14, +r.leads_l14), qlp: D(+r.ql_l14, +r.leads_l14), qqg: +r.qqg_l14, cpqqg: cp, cpqqg_p: D(+r.spend_p14, +r.qqg_p14),
+          action: cp == null || cp >= 1.5 * avg ? 'Pause' : cp <= 0.8 * avg ? 'Scale' : 'Keep'};
+      }).sort((a, b) => (a.cpqqg == null ? 1e12 : a.cpqqg) - (b.cpqqg == null ? 1e12 : b.cpqqg));
+    }});
+
+  dash.calc('pr_adsum', {title: 'Meta creative summary', description: 'Meta CPQQG over the last 14 days; count and spend share of ads flagged Pause and Scale.',
+    inputs: ['pr_meta_ads', 'pr_ads'], fn: (all, ads) => {
+      if (!need(all, ads)) return null;
+      const tot = S(all, 'spend_l14'), p = ads.filter((r) => r.action === 'Pause'), s = ads.filter((r) => r.action === 'Scale');
+      return {avg: D(tot, S(all, 'qqg_l14')), n_pause: p.length, pause_spend: S(p, 'spend'), pause_share: D(S(p, 'spend'), tot), n_scale: s.length, scale_share: D(S(s, 'spend'), tot)};
+    }});
+
+  dash.calc('pr_traits', {title: 'Meta creative traits, last 14 days', description: 'Meta spend, QQ-G and CPQQG over the last 14 days by creator type, format, language and creative age (days since the launch date in the ad name).',
+    inputs: ['pr_meta_ads', 'pr_meta'], fn: (ads, meta) => {
+      if (!need(ads, meta)) return null;
+      const end = new Date(meta.as_of + 'T00:00:00Z');
+      const age = (r) => { if (!r.launch) return 'Unknown'; const d = (end - new Date(r.launch + 'T00:00:00Z')) / 864e5; return d <= 14 ? '0–14 days' : d <= 30 ? '15–30 days' : d <= 60 ? '31–60 days' : '60+ days'; };
+      const out = [];
+      for (const [dim, key] of [['creator', (r) => r.creator], ['format', (r) => r.format], ['language', (r) => r.language], ['age', age]])
+        for (const [value, v] of d3.group(ads, key)) { const s = S(v, 'spend_l14'), q = S(v, 'qqg_l14'); if (s > 0) out.push({dim, value, spend: s, qqg: q, cpqqg: D(s, q)}); }
+      return out;
+    }});
+
+  dash.calc('pr_fmt', {title: 'Meta video vs static, daily', description: 'Per day: video and static share of Meta prospecting spend, with CPL, QL% and CPQQG, for the last 31 days.',
+    inputs: ['pr_meta_format_daily', 'pr_meta'], fn: (f, meta) => {
+      if (!need(f, meta)) return null;
+      const from = iso(new Date(new Date(meta.as_of + 'T00:00:00Z') - 30 * 864e5));
+      const out = [];
+      for (const [date, v] of d3.group(f.filter((r) => r.date >= from), (r) => r.date)) {
+        const tot = S(v, 'spend');
+        for (const r of v) out.push(Object.assign({date, format: r.format, share: D(+r.spend, tot)}, agg([r])));
+      }
+      return out.sort((a, b) => (a.date < b.date ? -1 : 1));
+    }});
+
+  dash.calc('pr_fmtsum', {title: 'Video vs static summary', description: 'Video share of Meta spend over the last 3 days vs the 7 days a month earlier, and video vs static CPQQG over the last 7 days.',
+    inputs: ['pr_meta_format_daily', 'pr_meta'], fn: (f, meta) => {
+      if (!need(f, meta)) return null;
+      const end = new Date(meta.as_of + 'T00:00:00Z'), day = (n) => iso(new Date(end - n * 864e5));
+      const win = (a, b, fm) => f.filter((r) => r.date >= a && r.date <= b && (!fm || r.format === fm));
+      const share = (a, b) => D(S(win(a, b, 'Video'), 'spend'), S(win(a, b), 'spend'));
+      const l7 = (fm) => agg(win(day(6), meta.as_of, fm));
+      return {video_l3: share(day(2), meta.as_of), video_m1: share(day(36), day(30)), m1_from: day(36), m1_to: day(30),
+        video_cpqqg: l7('Video').cpqqg, static_cpqqg: l7('Static').cpqqg, video_cpl: l7('Video').cpl, static_cpl: l7('Static').cpl};
+    }});
+
+  dash.calc('pr_actions', {title: 'Prospecting actions', description: 'Action lines worked out from the line-item status, creative flags, creative age and video vs static numbers on this tab.',
+    inputs: ['pr_camp', 'pr_adsum', 'pr_ads', 'pr_traits', 'pr_fmtsum'], fn: (camp, sum, ads, traits, fs) => {
+      if (!need(camp, sum, ads, traits, fs)) return null;
+      const F = window.amFmt, r = F.rupee, pc = (v) => F.pct(v), sg = (v) => (v > 0 ? '+' : '') + F.pct(v);
+      const out = [];
+      for (const ch of ['Meta', 'Google']) {
+        const mine = camp.filter((c) => c.channel === ch && c.qqg > 0);
+        const best = mine.filter((c) => c.status === 'Efficient').sort((a, b) => b.qqg - a.qqg)[0];
+        if (best) out.push({tag: 'Scale', tone: 'up', text: `${ch} ${best.label}: CPQQG ${r(best.cpqqg)} (${F.pct(best.ratio)} of the ${ch} average) on ${F.num(best.qqg)} QQ-G.`});
+        for (const c of mine.filter((c) => c.status === 'Expensive' && c.share >= 0.1).sort((a, b) => b.spend - a.spend))
+          out.push({tag: 'Cut back', tone: 'down', text: `${ch} ${c.label}: CPQQG ${r(c.cpqqg)}${c.cpqqg_chg != null ? ' (' + sg(c.cpqqg_chg) + ' vs LMTD)' : ''} on ${pc(c.share)} of ${ch} spend.`});
+        for (const c of mine.filter((c) => c.status !== 'Expensive' && c.spend_chg > 1 && c.cpqqg_chg > 0.25 && c.share >= 0.1))
+          out.push({tag: 'Watch', tone: 'warn', text: `${ch} ${c.label}: spend ${c.spend_chg >= 2 ? (c.spend_chg + 1).toFixed(1) + '× LMTD' : sg(c.spend_chg) + ' vs LMTD'} and CPQQG ${sg(c.cpqqg_chg)} to ${r(c.cpqqg)}. Hold budget until it settles.`});
+      }
+      if (sum.n_pause) out.push({tag: 'Pause', tone: 'down', text: `${sum.n_pause} Meta ads (${F.rL(sum.pause_spend)}, ${pc(sum.pause_share)} of Meta spend in 14 days) run at 1.5× the Meta CPQQG or have no QQ-G. List under Creatives → Pause.`});
+      const a0 = traits.find((t) => t.dim === 'age' && t.value === '0–14 days'), a1 = traits.find((t) => t.dim === 'age' && t.value === '15–30 days');
+      if (a0 && a1 && a0.cpqqg && a1.cpqqg && a1.cpqqg > a0.cpqqg * 1.1)
+        out.push({tag: 'Add new', tone: 'warn', text: `Creatives tire by week 3: ads 15–30 days old run at ${r(a1.cpqqg)} CPQQG vs ${r(a0.cpqqg)} for ads under 2 weeks. Keep 4–6 new launches a week in the top-performer mould.`});
+      else if (sum.n_scale < 5) out.push({tag: 'Add new', tone: 'warn', text: `Only ${sum.n_scale} ads qualify as top performers. Brief new variants of them.`});
+      if (fs.video_cpqqg && fs.static_cpqqg && fs.video_cpqqg > fs.static_cpqqg * 1.15 && fs.video_l3 > 0.5)
+        out.push({tag: 'Mix', tone: 'warn', text: `Video is ${pc(fs.video_l3)} of Meta spend in the last 3 days but costs ${r(fs.video_cpqqg)} per QQ-G vs ${r(fs.static_cpqqg)} for static. Move budget back to static.`});
+      return out;
+    }});
+})();
+</script>
+
+<script>
+(function () {
+  const F = window.amFmt;
+  window.amState.pr = {ch: 'Total', ovm: 'cpqqg', lich: 'Meta', lim: 'cpqqg', camp: null, cr: 'Scale', fm: 'cpqqg'};
+  const st = window.amState.pr;
+  const ok = (id) => { const d = dash.data(id); return d.status === 'ok' && d.data ? d.data : null; };
+  const sg = (v, fmt) => (v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + fmt(Math.abs(v)));
+  const pctAbs = (v) => (v * 100).toFixed(1) + '%';
+  const ppAbs = (v) => (v * 100).toFixed(1) + ' pts';
+  const lowerBetter = {cpl: true, cpqqg: true};
+  const fmtK = {spend: F.rL, leads: F.num, qqg: F.num, cpl: F.rupee, cpqqg: F.rupee, qlp: (v) => F.pct(v, 1)};
+  const tone = (k, v) => { if (v == null || k === 'spend') return 'flat'; const th = k === 'qlp' ? 0.005 : 0.02; if (Math.abs(v) < th) return 'flat'; return (lowerBetter[k] ? v < 0 : v > 0) ? 'up' : 'down'; };
+  const fmtD = (s) => d3.utcFormat('%-d %b')(new Date(s + 'T00:00:00Z'));
+  const fail = (el) => { el.replaceChildren(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: window.__prError ? 'Prospecting data failed to load' : '—'})); };
+
+  dash.draw('pr-win', (el) => { const w = ok('pr_win'); if (!w) { el.textContent = '—'; return; }
+    el.textContent = {mtd: fmtD(w.mtd_start) + '–' + fmtD(w.mtd_end), lmtd: fmtD(w.lmtd_start) + '–' + fmtD(w.lmtd_end), asof: fmtD(w.as_of), l14: fmtD(w.l14_start) + '–' + fmtD(w.as_of)}[el.dataset.field] || '—'; });
+  dash.draw('pr-lede', (el) => { const k = ok('pr_kpi'); const r = k && k.find((x) => x.channel === el.dataset.ch); if (!r) { el.textContent = '—'; return; }
+    const f = el.dataset.field; el.className = '';
+    if (f.endsWith('_chg')) { el.textContent = sg(r[f], pctAbs); el.className = 'am-' + {up: 'ok', down: 'bad', flat: ''}[tone('cpqqg', r[f])]; } else el.textContent = F.rupee(r[f]); });
+  dash.draw('pr-kpi', (el) => { const k = ok('pr_kpi'); const r = k && k.find((x) => x.channel === st.ch); el.textContent = r ? fmtK[el.dataset.field](r[el.dataset.field]) : '—'; });
+  dash.draw('pr-kpi-meta', (el) => { const k = ok('pr_kpi'); const r = k && k.find((x) => x.channel === st.ch); const f = el.dataset.field; if (!r) { el.textContent = '—'; return; }
+    const c = r[f + '_chg']; const pill = document.createElement('span'); pill.className = 'am-dir ' + tone(f, c); pill.textContent = sg(c, f === 'qlp' ? ppAbs : pctAbs);
+    el.replaceChildren(pill, document.createTextNode(' LMTD ' + fmtK[f](r[f + '_o']))); });
+
+  // Line chart: series [{name, color, dashed, pts:[{x, y, label}]}], x numeric or Date
+  function lines(el, series, fmt, opt) {
+    el.replaceChildren();
+    const all = series.flatMap((s) => s.pts).filter((p) => p.y != null);
+    if (!all.length) { el.append(Object.assign(document.createElement('div'), {className: 'am-fail', textContent: 'No data for this selection'})); return; }
+    const W = el.clientWidth || 600, H = el.classList.contains('sm') ? 170 : 220, m = {t: 10, r: 10, b: 22, l: 8};
+    const svg = d3.select(el).append('svg').attr('width', W).attr('height', H).attr('role', 'img').attr('aria-label', opt.label);
+    const y = d3.scaleLinear().domain([0, d3.max(all, (p) => p.y) * 1.05]).nice().range([H - m.b, m.t]);
+    const ya = svg.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(fmt).tickSize(0));
+    let lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); });
+    m.l = lw + 10; ya.attr('transform', `translate(${m.l - 4},0)`); ya.select('.domain').remove();
+    ya.selectAll('text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+    svg.insert('g', ':first-child').selectAll('line').data(y.ticks(4)).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y).attr('y2', y).style('stroke', 'var(--cds-chart-grid)');
+    const x = (opt.time ? d3.scaleUtc() : d3.scaleLinear()).domain(opt.xdomain || d3.extent(all, (p) => p.x)).range([m.l, W - m.r]);
+    const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - m.l) / 80))).tickFormat(opt.xfmt).tickSize(3));
+    xa.select('.domain').style('stroke', 'var(--cds-chart-axis)'); xa.selectAll('line').style('stroke', 'var(--cds-chart-axis)'); xa.selectAll('text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+    for (const s of series) {
+      const pts = s.pts.filter((p) => p.y != null);
+      svg.append('path').datum(pts).attr('fill', 'none').style('stroke', s.color).attr('stroke-width', s.dashed ? 1.5 : 2).attr('stroke-dasharray', s.dashed ? '4 3' : null).attr('d', d3.line().x((p) => x(p.x)).y((p) => y(p.y)));
+      if (!s.dashed && pts.length) { const l = pts[pts.length - 1]; svg.append('circle').attr('r', 3).attr('cx', x(l.x)).attr('cy', y(l.y)).style('fill', s.color); }
+    }
+    const xs = Array.from(new Set(all.map((p) => +p.x))).sort((a, b) => a - b);
+    const tip = Object.assign(document.createElement('div'), {className: 'am-tip'}); el.append(tip);
+    const vl = svg.append('line').attr('y1', m.t).attr('y2', H - m.b).style('stroke', 'var(--cds-chart-reference)').style('opacity', 0);
+    const move = (ev) => {
+      const t = +x.invert(d3.pointer(ev, svg.node())[0]); const xv = xs.reduce((b, q) => (Math.abs(q - t) < Math.abs(b - t) ? q : b), xs[0]);
+      vl.attr('x1', x(xv)).attr('x2', x(xv)).style('opacity', 1);
+      const b = document.createElement('b'); b.textContent = opt.tipx(xv); tip.replaceChildren(b);
+      for (const s of series) { const p = s.pts.find((q) => +q.x === xv); const sp = document.createElement('span'); sp.textContent = s.name + ': ' + (p && p.y != null ? fmt(p.y) : '—'); tip.append(sp, document.createElement('br')); }
+      tip.style.opacity = 1; tip.style.left = Math.max(70, Math.min(x(xv), W - 70)) + 'px'; tip.style.top = '40px';
+    };
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', Math.max(0, W - m.l - m.r)).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('pointermove', move).on('pointerdown', move).on('pointerleave', () => { tip.style.opacity = 0; vl.style('opacity', 0); });
+  }
+  const mFmt = (k) => (k === 'qlp' ? (v) => F.pct(v, 0) : k === 'spend' ? F.rL : F.rupee);
+  const mTip = (k) => (k === 'qlp' ? (v) => F.pct(v, 1) : k === 'spend' ? F.rL : F.rupee);
+
+  dash.draw('pr-ov-chart', (el) => { const d = ok('pr_dom'), w = ok('pr_win'); if (!d || !w) return fail(el); const k = st.ovm;
+    const mine = d.filter((r) => r.channel === st.ch);
+    const cm = d3.utcFormat('%b')(new Date(w.mtd_start + 'T00:00:00Z')), pm = d3.utcFormat('%b')(new Date(w.lmtd_start + 'T00:00:00Z'));
+    const last = d3.max(mine.filter((r) => r.per === 'cur'), (r) => r.day) || 31;
+    lines(el, [
+      {name: pm, color: 'var(--cds-chart-reference)', dashed: true, pts: mine.filter((r) => r.per === 'prev' && r.day <= Math.max(last, 14)).map((r) => ({x: r.day, y: r[k]}))},
+      {name: cm, color: 'var(--am-accent)', pts: mine.filter((r) => r.per === 'cur').map((r) => ({x: r.day, y: r[k]}))}
+    ], mFmt(k), {label: st.ch + ' prospecting by day of month, this month vs last', xfmt: (v) => v, tipx: (v) => 'Day ' + v});
+  });
+
+  const segs = (id, key, redraw, attr) => document.querySelectorAll('#' + id + ' button').forEach((b) => b.addEventListener('click', () => {
+    st[key] = b.dataset[attr]; document.querySelectorAll('#' + id + ' button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); redraw.forEach((n) => dash.draw(n)); }));
+  const chips = (id, key, redraw) => document.querySelectorAll('#' + id + ' .am-chip').forEach((b) => b.addEventListener('click', () => {
+    st[key] = b.dataset.ch; document.querySelectorAll('#' + id + ' .am-chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); redraw.forEach((n) => dash.draw(n)); }));
+  chips('pr-ch', 'ch', ['pr-kpi', 'pr-kpi-meta', 'pr-ov-chart']);
+  segs('pr-ov-metric', 'ovm', ['pr-ov-chart'], 'm');
+  chips('pr-li-ch', 'lich', ['pr-camps', 'pr-li-title', 'pr-li-chart']);
+  segs('pr-li-metric', 'lim', ['pr-li-chart'], 'm');
+  segs('pr-cr-view', 'cr', ['pr-ads'], 'v');
+  segs('pr-fmt-metric', 'fm', ['pr-fmt-chart'], 'm');
+
+  dash.draw('pr-actions', (ul) => { const a = ok('pr_actions'); ul.replaceChildren(); if (!a) { ul.append(Object.assign(document.createElement('li'), {className: 'pr-plain', textContent: '—'})); return; }
+    for (const x of a) { const li = document.createElement('li'); const t = document.createElement('span'); t.className = 'am-dir ' + x.tone; t.textContent = x.tag; const s = document.createElement('span'); s.textContent = x.text; li.append(t, s); ul.append(li); } });
+
+  const td = (tr, t, c) => { const e = document.createElement('td'); e.textContent = t; if (c) e.className = c; tr.append(e); return e; };
+  const toneCell = (e, k, v) => { const t = tone(k, v); if (t !== 'flat') e.classList.add(t === 'up' ? 'am-c-ok' : 'am-c-bad'); };
+  const pillCell = (tr, text, t) => { const e = td(tr, '', 'pr-l'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = text; e.append(s); };
+  const head = (cols) => { const th = document.createElement('thead'), tr = document.createElement('tr'); cols.forEach((c, i) => { const h = document.createElement('th'); h.textContent = c; if (i === 0) h.className = 'am-stick'; tr.append(h); }); th.append(tr); return th; };
+
+  dash.draw('pr-camps', (el) => { const c = ok('pr_camp'); if (!c) return fail(el);
+    const rows = c.filter((r) => r.channel === st.lich);
+    if (!st.camp || !c.find((r) => r.campaign === st.camp && r.channel === st.lich)) st.camp = rows[0] && rows[0].campaign;
+    const t = document.createElement('table'); t.className = 'am-mx'; t.append(head(['Line item', 'Spend', 'Share', 'CPL', 'Δ', 'QL%', 'Δ', 'QQ-G', 'CPQQG', 'Δ', 'Status']));
+    const tb = document.createElement('tbody');
+    for (const r of rows) { const tr = document.createElement('tr'); tr.className = 'pr-click' + (r.campaign === st.camp ? ' pr-sel' : ''); tr.title = r.campaign;
+      const n = td(tr, r.label, 'am-stick'); n.style.maxWidth = '260px'; n.style.overflow = 'hidden'; n.style.textOverflow = 'ellipsis';
+      td(tr, F.rL(r.spend)); td(tr, F.pct(r.share)); td(tr, F.rupee(r.cpl)); toneCell(td(tr, sg(r.cpl_chg, (v) => F.pct(v))), 'cpl', r.cpl_chg);
+      td(tr, F.pct(r.qlp)); toneCell(td(tr, sg(r.qlp_chg, (v) => (v * 100).toFixed(1) + 'p')), 'qlp', r.qlp_chg);
+      td(tr, F.num(r.qqg)); td(tr, F.rupee(r.cpqqg)); toneCell(td(tr, sg(r.cpqqg_chg, (v) => F.pct(v))), 'cpqqg', r.cpqqg_chg);
+      pillCell(tr, r.status, {Efficient: 'up', Expensive: 'down'}[r.status] || 'flat');
+      tr.addEventListener('click', () => { st.camp = r.campaign; dash.draw('pr-camps'); dash.draw('pr-li-title'); dash.draw('pr-li-chart'); });
+      tb.append(tr); }
+    t.append(tb); el.replaceChildren(t); });
+
+  dash.draw('pr-li-title', (el) => { const c = ok('pr_camp'); const r = c && c.find((x) => x.campaign === st.camp); el.textContent = r ? r.label : '—'; });
+  dash.draw('pr-li-chart', (el) => { const cd = ok('pr_campaign_daily'), w = ok('pr_win'); if (!cd || !w || !st.camp) return fail(el); const k = st.lim;
+    const from = w.lmtd_start, rows = cd.filter((r) => r.campaign === st.camp && r.date >= from), ch = rows.length ? rows[0].channel : st.lich;
+    const P = (s) => new Date(s + 'T00:00:00Z');
+    const series = [{name: 'Line item', color: 'var(--am-accent)', pts: rows.map((r) => ({x: P(r.date), y: window.prAgg([r])[k]}))}];
+    if (k !== 'spend') series.unshift({name: ch, color: 'var(--cds-chart-reference)', dashed: true, pts: Array.from(d3.group(cd.filter((r) => r.channel === ch && r.date >= from), (r) => r.date)).sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([d, v]) => ({x: P(d), y: window.prAgg(v)[k]}))});
+    lines(el, series, mFmt(k), {time: true, label: 'Selected line item by day', xfmt: d3.utcFormat('%-d %b'), tipx: (v) => d3.utcFormat('%a %-d %b')(new Date(v))}); });
+
+  dash.draw('pr-adavg', (el) => { const s = ok('pr_adsum'); el.textContent = s ? F.rupee(s.avg) : '—'; });
+  dash.draw('pr-ads', (el) => { const a = ok('pr_ads'); if (!a) return fail(el);
+    let rows = st.cr === 'all' ? a : a.filter((r) => r.action === st.cr); if (st.cr === 'Pause') rows = rows.slice().sort((x, y) => y.spend - x.spend);
+    const t = document.createElement('table'); t.className = 'am-mx'; t.append(head(['Creative', 'Spend', 'CPL', 'QL%', 'QQ-G', 'CPQQG', 'Prev 14d', '']));
+    const tb = document.createElement('tbody');
+    for (const r of rows) { const tr = document.createElement('tr'); tr.title = r.ad;
+      const c = td(tr, '', 'am-stick pr-cr'); const b = document.createElement('b'); b.textContent = r.hook; const s = document.createElement('span'); s.textContent = [r.partner, r.format, r.language, r.creator].join(' · '); c.append(b, s);
+      td(tr, F.rL(r.spend)); td(tr, F.rupee(r.cpl)); td(tr, F.pct(r.qlp)); td(tr, F.num(r.qqg));
+      const cp = td(tr, r.cpqqg == null ? 'No QQ-G' : F.rupee(r.cpqqg)); cp.style.fontWeight = '600'; td(tr, F.rupee(r.cpqqg_p), 'am-tgt');
+      pillCell(tr, r.action, {Scale: 'up', Pause: 'down'}[r.action] || 'flat'); tb.append(tr); }
+    if (!rows.length) { const tr = document.createElement('tr'); const e = td(tr, 'No ads in this view', 'pr-l'); e.colSpan = 8; tb.append(tr); }
+    t.append(tb); el.replaceChildren(t); });
+
+  dash.draw('pr-traits', (ul) => { const a = ok('pr_ads'), tr = ok('pr_traits'); ul.replaceChildren(); if (!a || !tr) return;
+    const top = a.filter((r) => r.action === 'Scale'); if (!top.length) return;
+    const li = (t) => ul.append(Object.assign(document.createElement('li'), {className: 'pr-plain', textContent: t}));
+    const mode = (k) => Array.from(d3.rollup(top, (v) => v.length, (r) => r[k])).sort((x, y) => y[1] - x[1])[0];
+    const [fm, fn] = mode('format'), [cr, cn] = mode('creator');
+    const langs = Array.from(d3.rollup(top, (v) => v.length, (r) => r.language)).sort((x, y) => y[1] - x[1]).slice(0, 2).map((x) => x[0]);
+    li(`${fn} of ${top.length} top performers are ${fm.toLowerCase()}, and ${cn} are ${cr === 'AI generated' ? 'AI-generated' : cr}. Most are in ${langs.join(' or ')}.`);
+    const c = (dim, v) => tr.find((t) => t.dim === dim && t.value === v);
+    const crs = tr.filter((t) => t.dim === 'creator' && t.cpqqg && t.spend >= 300000).sort((x, y) => x.cpqqg - y.cpqqg);
+    if (crs.length >= 2) li(`By creator type, ${crs[0].value} is cheapest at ${F.rupee(crs[0].cpqqg)} CPQQG and ${crs[crs.length - 1].value} costliest at ${F.rupee(crs[crs.length - 1].cpqqg)}.`);
+    const ls = tr.filter((t) => t.dim === 'language' && t.cpqqg && t.spend >= 300000).sort((x, y) => x.cpqqg - y.cpqqg);
+    if (ls.length >= 3) li(`By language, ${ls[0].value} (${F.rupee(ls[0].cpqqg)}) and ${ls[1].value} (${F.rupee(ls[1].cpqqg)}) lead; ${ls.slice(-2).map((x) => x.value + ' (' + F.rupee(x.cpqqg) + ')').join(' and ')} trail.`);
+    const best = top[0]; li(`Best single ad: ${best.hook} (${best.partner}, ${best.language} ${best.format.toLowerCase()}) at ${F.rupee(best.cpqqg)} CPQQG on ${F.rL(best.spend)}.`);
+  });
+
+  dash.draw('pr-fmt-sub', (el) => { const s = ok('pr_fmtsum'); if (!s) { el.textContent = '—'; return; }
+    el.textContent = `Video is ${F.pct(s.video_l3)} of Meta spend over the last 3 days, against ${F.pct(s.video_m1)} a month earlier (${fmtD(s.m1_from)}–${fmtD(s.m1_to)}). Last 7 days: video CPQQG ${F.rupee(s.video_cpqqg)} vs static ${F.rupee(s.static_cpqqg)}; CPL ${F.rupee(s.video_cpl)} vs ${F.rupee(s.static_cpl)}.`; });
+
+  dash.draw('pr-fmt-share', (el) => { const d = ok('pr_fmt'); if (!d) return fail(el); el.replaceChildren();
+    const days = Array.from(new Set(d.map((r) => r.date))); const get = (dt, fm) => ((d.find((r) => r.date === dt && r.format === fm) || {}).share || 0);
+    const W = el.clientWidth || 600, H = 170, m = {t: 6, r: 10, b: 22, l: 34};
+    const svg = d3.select(el).append('svg').attr('width', W).attr('height', H).attr('role', 'img').attr('aria-label', 'Daily share of Meta spend, video vs static');
+    const x = d3.scaleBand().domain(days).range([m.l, W - m.r]).padding(0.12), y = d3.scaleLinear().domain([0, 1]).range([H - m.b, m.t]);
+    const ya = svg.append('g').attr('transform', `translate(${m.l - 4},0)`).call(d3.axisLeft(y).tickValues([0, 0.5, 1]).tickFormat((v) => v * 100 + '%').tickSize(0)); ya.select('.domain').remove();
+    ya.selectAll('text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+    const step = Math.ceil(days.length / Math.max(2, Math.floor((W - m.l) / 64)));
+    const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickValues(days.filter((_, i) => i % step === 0)).tickFormat(fmtD).tickSize(0));
+    xa.select('.domain').remove(); xa.selectAll('text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+    for (const dt of days) { const v = get(dt, 'Video'), s = get(dt, 'Static');
+      svg.append('rect').attr('x', x(dt)).attr('width', x.bandwidth()).attr('y', y(v)).attr('height', y(0) - y(v)).style('fill', 'var(--am-accent)');
+      svg.append('rect').attr('x', x(dt)).attr('width', x.bandwidth()).attr('y', y(v + s)).attr('height', y(v) - y(v + s)).style('fill', '#c46a2b').style('opacity', 0.85); }
+    svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(0.5)).attr('y2', y(0.5)).style('stroke', 'var(--color-bg)').attr('stroke-dasharray', '3 3');
+    const tip = Object.assign(document.createElement('div'), {className: 'am-tip'}); el.append(tip);
+    const move = (ev) => { const px = d3.pointer(ev, svg.node())[0]; const i = Math.max(0, Math.min(days.length - 1, Math.floor((px - m.l) / x.step()))); const dt = days[i];
+      const b = document.createElement('b'); b.textContent = d3.utcFormat('%a %-d %b')(new Date(dt + 'T00:00:00Z'));
+      const s1 = document.createElement('span'); s1.textContent = 'Video ' + F.pct(get(dt, 'Video')) + ' · Static ' + F.pct(get(dt, 'Static'));
+      tip.replaceChildren(b, s1); tip.style.opacity = 1; tip.style.left = Math.max(80, Math.min(x(dt), W - 80)) + 'px'; tip.style.top = '40px'; };
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', H - m.t - m.b).attr('fill', 'transparent').on('pointermove', move).on('pointerdown', move).on('pointerleave', () => { tip.style.opacity = 0; });
+  });
+
+  dash.draw('pr-fmt-chart', (el) => { const d = ok('pr_fmt'); if (!d) return fail(el); const k = st.fm, P = (s) => new Date(s + 'T00:00:00Z');
+    lines(el, [{name: 'Static', color: '#c46a2b', pts: d.filter((r) => r.format === 'Static').map((r) => ({x: P(r.date), y: r[k]}))},
+      {name: 'Video', color: 'var(--am-accent)', pts: d.filter((r) => r.format === 'Video').map((r) => ({x: P(r.date), y: r[k]}))}],
+      mFmt(k), {time: true, label: 'Meta video vs static by day', xfmt: d3.utcFormat('%-d %b'), tipx: (v) => d3.utcFormat('%a %-d %b')(new Date(v))}); });
+})();
+</script>
+
+<script>
+window.__amDataP = fetch('data.json', {cache: 'no-store'})
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(function (p) { window.__amLoad(p); })
   .catch(function (e) { window.__amError = String(e); var l = document.getElementById('am-loading'); if (l) l.textContent = 'Could not load the data. Please refresh.'; });
+</script>
+<script>
+Promise.all([
+  fetch('prospecting.json', {cache: 'no-store'}).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }),
+  window.__amDataP.catch(function () {})
+]).then(function (res) { window.__amLoad(res[0]); })
+  .catch(function (e) { window.__prError = String(e); dash.draw('pr-camps'); });
 </script>
 </body>
 </html>

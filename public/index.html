@@ -244,7 +244,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
   <section id="daily" class="am-panel" role="tabpanel" hidden>
     <h2 class="am-h2">Day on day</h2>
-    <p class="am-sub">Pick a line item. Swipe the table sideways for earlier days; week and month totals sit at the right. Achieved % compares each day with that day's plan target. CPL = Spend ÷ Leads · CVR = Sales ÷ Leads · COA = Spend ÷ APE.</p>
+    <p class="am-sub">Pick a line item. Swipe the table sideways for earlier days; week and month totals sit at the right. Achieved % compares each day with that day's plan target. Cost pacing = Spend ÷ Target spend (green within ±10%). CPL turns green at or under its target. CPL = Spend ÷ Leads · CVR = Sales ÷ Leads · COA = Spend ÷ APE.</p>
     <div class="am-chips" role="group" aria-label="Line item" id="am-items">
       <button type="button" class="am-chip" data-item="All channels" aria-pressed="true">All channels</button>
       <button type="button" class="am-chip" data-item="SEO" aria-pressed="false">SEO</button>
@@ -268,6 +268,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
           <button type="button" data-metric="cvr" aria-pressed="true">CVR</button>
           <button type="button" data-metric="leads_ach" aria-pressed="false">Leads ach.</button>
           <button type="button" data-metric="ape_ach" aria-pressed="false">APE ach.</button>
+          <button type="button" data-metric="spend_pacing" aria-pressed="false">Cost pacing</button>
           <button type="button" data-metric="cpl" aria-pressed="false">CPL</button>
           <button type="button" data-metric="coa" aria-pressed="false">COA</button>
           <button type="button" data-metric="leads" aria-pressed="false">Leads</button>
@@ -308,10 +309,13 @@ window.amFmt = (function () {
   const rupee = (v) => (ok(v) ? '₹' + inr.format(v) : '—');
   const rL = (v) => (ok(v) ? '₹' + inr1.format(v / 1e5) + 'L' : '—');
   const status = (v) => (!ok(v) ? '' : v >= 1 ? 'ok' : v >= 0.9 ? 'warn' : 'bad');
+  const pace = (v) => (!ok(v) ? '' : v >= 0.9 && v <= 1.1 ? 'ok' : v >= 0.8 && v <= 1.2 ? 'warn' : 'bad');
+  const cplStatus = (v, t) => (!ok(v) || !t ? '' : v <= t ? 'ok' : v <= t * 1.1 ? 'warn' : 'bad');
   const metric = {
     cvr: {label: 'CVR', fmt: (v) => pct(v, 2), axis: (v) => pct(v, 1)},
     leads_ach: {label: 'Leads achieved vs daily target', fmt: (v) => pct(v), axis: (v) => pct(v), ref: 1},
     ape_ach: {label: 'APE achieved vs daily target', fmt: (v) => pct(v), axis: (v) => pct(v), ref: 1},
+    spend_pacing: {label: 'Cost pacing vs daily target spend', fmt: (v) => pct(v), axis: (v) => pct(v), ref: 1, color: (v) => pace(v)},
     cpl: {label: 'CPL', fmt: rupee, axis: rupee},
     coa: {label: 'COA', fmt: (v) => pct(v, 0), axis: (v) => pct(v, 0)},
     leads: {label: 'Leads', fmt: num, axis: num},
@@ -319,7 +323,7 @@ window.amFmt = (function () {
     spend: {label: 'Spend', fmt: rL, axis: (v) => '₹' + inr.format(v / 1e5) + 'L'}
   };
   const enc = (s) => String(s).replace(/%/g, '%25').replace(/&/g, '%26').replace(/=/g, '%3D').replace(/,/g, '%2C');
-  return {num, lakh, pct, rupee, rL, status, metric, enc, ok};
+  return {num, lakh, pct, rupee, rL, status, pace, cplStatus, metric, enc, ok};
 })();
 window.amState = {item: 'All channels', metric: 'cvr', tab: 'overview'};
 </script>
@@ -369,7 +373,7 @@ dash.calc('as_of', {
 
 dash.calc('dod_matrix', {
   title: 'Day-on-day metrics with targets',
-  description: 'For each line item, each day and each week (W1 = 1–7, W2 = 8–14, W3 = 15–21, W4 = 22–30) and month to date: spend, leads, sales, APE, the plan targets for the same days, achieved % (actual ÷ target), CPL (spend ÷ leads), CVR (sales ÷ leads) and COA (spend ÷ APE). Week and month targets add up only the days that have data.',
+  description: 'For each line item, each day and each week (W1 = 1–7, W2 = 8–14, W3 = 15–21, W4 = 22–30) and month to date: spend, leads, sales, APE, the plan targets for the same days, achieved % (actual ÷ target), cost pacing (spend ÷ target spend), CPL (spend ÷ leads) and target CPL (target spend ÷ target leads), CVR (sales ÷ leads) and COA (spend ÷ APE). Week and month targets add up only the days that have data.',
   inputs: ['daily_performance', 'daily_targets'],
   fn: (daily, targets) => {
     const tKey = (r) => r.line_item + '|' + r.date;
@@ -377,8 +381,9 @@ dash.calc('dod_matrix', {
     const build = (item, col, rows) => {
       const spend = sum(rows, 'spend'), leads = sum(rows, 'leads'), sales = sum(rows, 'sales'), ape = sum(rows, 'ape');
       const ts = rows.map((r) => tMap.get(tKey(r)) || {});
-      const target_leads = sum(ts, 'target_leads'), target_sales = sum(ts, 'target_sales'), target_ape = sum(ts, 'target_ape');
-      return {line_item: item, col, days: rows.length, spend, leads, target_leads, leads_ach: target_leads ? leads / target_leads : null,
+      const target_leads = sum(ts, 'target_leads'), target_sales = sum(ts, 'target_sales'), target_ape = sum(ts, 'target_ape'), target_spend = sum(ts, 'target_spend');
+      return {line_item: item, col, days: rows.length, spend, target_spend, spend_pacing: target_spend ? spend / target_spend : null,
+        target_cpl: target_spend && target_leads ? target_spend / target_leads : null, leads, target_leads, leads_ach: target_leads ? leads / target_leads : null,
         cpl: leads && spend ? spend / leads : null, sales, target_sales, sales_ach: target_sales ? sales / target_sales : null,
         cvr: leads ? sales / leads : null, ape, target_ape, ape_ach: target_ape ? ape / target_ape : null,
         coa: ape && spend ? spend / ape : null};
@@ -542,8 +547,9 @@ dash.calc('cream_period', {
   }));
 
   const ROWS = [
-    ['spend', 'Spend', F.rL, 'g'], ['leads', 'Leads', F.num], ['target_leads', 'Target leads', F.num, 't'], ['leads_ach', 'Leads achieved', (v) => F.pct(v), 'a'],
-    ['cpl', 'CPL', F.rupee],
+    ['spend', 'Spend', F.rL, 'g'], ['target_spend', 'Target spend', F.rL, 't'], ['spend_pacing', 'Cost pacing', (v) => F.pct(v), 'p'],
+    ['leads', 'Leads', F.num, 'g'], ['target_leads', 'Target leads', F.num, 't'], ['leads_ach', 'Leads achieved', (v) => F.pct(v), 'a'],
+    ['cpl', 'CPL', F.rupee, 'c'], ['target_cpl', 'Target CPL', F.rupee, 't'],
     ['sales', 'Sales', F.num, 'g'], ['target_sales', 'Target sales', F.num, 't'], ['sales_ach', 'Sales achieved', (v) => F.pct(v), 'a'], ['cvr', 'CVR', (v) => F.pct(v, 2)],
     ['ape', 'APE', F.rL, 'g'], ['target_ape', 'Target APE', F.rL, 't'], ['ape_ach', 'APE achieved', (v) => F.pct(v), 'a'], ['coa', 'COA', (v) => F.pct(v, 0)]
   ];
@@ -585,6 +591,8 @@ dash.calc('cream_period', {
         if (!/^\d{4}-/.test(c.col)) { td.classList.add('am-per'); if (c.col === 'W1') td.classList.add('am-per-first'); }
         if (kind === 't') td.classList.add('am-tgt');
         if (kind === 'a' && v != null) td.classList.add('am-c-' + F.status(v));
+        if (kind === 'p' && v != null) td.classList.add('am-c-' + F.pace(v));
+        if (kind === 'c' && v != null && c.target_cpl) td.classList.add('am-c-' + F.cplStatus(v, c.target_cpl));
         tr.append(td);
       });
       tb.append(tr);
@@ -650,7 +658,7 @@ dash.calc('cream_period', {
       g.append('line').attr('x1', 0).attr('x2', iw).attr('y1', ih).attr('y2', ih).style('stroke', 'var(--cds-chart-axis)');
       const good = rows.filter((r) => r.v != null);
       const reduce = !window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const colorOf = (r) => (M.ref ? 'var(--color-' + F.status(r.v) + ')' : dash.colors[0]);
+      const colorOf = (r) => (M.ref ? 'var(--color-' + (M.color ? M.color(r.v) : F.status(r.v)) + ')' : dash.colors[0]);
       const bars = g.append('g').selectAll('rect').data(good).join('rect')
         .attr('x', (r) => x(+r.t)).attr('width', x.bandwidth()).attr('rx', Math.min(4, x.bandwidth() / 3)).style('fill', colorOf);
       if (!made.played && !reduce) {

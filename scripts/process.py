@@ -14,6 +14,8 @@ Rules:
   Source codes map to DRR line items via the Mapping sheet; config/overrides.json can
   move a source code to another short line item (NewBlank7 -> Brand).
   Cream = income 10L+ AND Salaried AND Graduate & above.
+  Spend targets: the plan's Cost column, spread across days on the QL curve (the same
+  curve as leads), so a day's target spend = its target leads x the line item's plan CPL.
 """
 import argparse, json, re, sys
 from datetime import datetime, timezone
@@ -147,13 +149,25 @@ def load_plan(path, month_start):
             break
     if not start:
         sys.exit(f'Plan block "{label}" not found in sheet FInal')
-    col, r0 = start.column, start.row + 2
+    col, hdr_row = start.column, start.row + 1
+    heads = {}
+    for c in range(col, col + 20):
+        h = s(ws.cell(hdr_row, c).value).lower()
+        if h and h not in heads:
+            heads[h] = c
+    need = {'leads': 'leads', 'nop': 'nop', 'afyp': 'afyp'}
+    for k in need:
+        if k not in heads:
+            sys.exit(f'Column "{k}" not found in the {label} header row')
+    c_cost, c_cpl = heads.get('cost'), heads.get('cpl')
     plan = {}
-    for r in range(r0, r0 + 40):
+    for r in range(hdr_row + 1, hdr_row + 41):
         k = s(ws.cell(r, col).value)
         if not k:
             continue
-        plan[k] = dict(L=num(ws.cell(r, col + 1).value), N=num(ws.cell(r, col + 4).value), A=num(ws.cell(r, col + 7).value) * 1e7)
+        plan[k] = dict(L=num(ws.cell(r, heads['leads']).value), N=num(ws.cell(r, heads['nop']).value),
+                       A=num(ws.cell(r, heads['afyp']).value) * 1e7,
+                       C=num(ws.cell(r, c_cost).value) if c_cost else 0.0)
     dod = wb['DOD']
     nop = [num(dod.cell(r, 3).value) for r in range(2, 2 + month_start.days_in_month)]
     ape = [num(dod.cell(r, 4).value) for r in range(2, 2 + month_start.days_in_month)]
@@ -201,11 +215,13 @@ def main():
             cream.append(dict(date=x.strftime('%Y-%m-%d'), line_item=it, leads=len(lpart), cream_leads=int(lpart.cream.sum())))
 
     plan, ql, nop, apec = load_plan(a.plan, month_start)
+    paid_rows = [k for k in plan if not k.lower().startswith(('total', 'unique'))]
     unique_total = dict(L=plan.get('Total Unique Leads excluding HSA ULIP', {}).get('L', 0),
                         N=plan.get('Unique Sale excluding HSA ULIP', {}).get('N', 0),
-                        A=plan.get('Unique Sale excluding HSA ULIP', {}).get('A', 0))
+                        A=plan.get('Unique Sale excluding HSA ULIP', {}).get('A', 0),
+                        C=sum(plan[k].get('C', 0) for k in paid_rows))
     tot = lambda keys, m: sum(plan.get(k, {}).get(m, 0) for k in keys)
-    item_t = {it: {m: tot(keys, m) for m in 'LNA'} for it, keys in ITEM_PLAN.items()}
+    item_t = {it: {m: tot(keys, m) for m in 'LNAC'} for it, keys in ITEM_PLAN.items()}
     item_t['All channels'] = unique_total
     targets = []
     for i, x in enumerate(pd.date_range(month_start, month_start + pd.offsets.MonthEnd(0))):
@@ -213,7 +229,8 @@ def main():
             targets.append(dict(date=x.strftime('%Y-%m-%d'), line_item=it,
                                 target_leads=round(t['L'] * ql[i] / sum(ql), 1),
                                 target_sales=round(t['N'] * nop[i] / sum(nop), 2),
-                                target_ape=round(t['A'] * apec[i] / sum(apec))))
+                                target_ape=round(t['A'] * apec[i] / sum(apec)),
+                                target_spend=round(t['C'] * ql[i] / sum(ql))))
 
     n = last.day
     shL, shN, shA = sum(ql[:n]) / sum(ql), sum(nop[:n]) / sum(nop), sum(apec[:n]) / sum(apec)

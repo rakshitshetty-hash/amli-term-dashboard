@@ -22,13 +22,14 @@ A static site with three tabs (Overview, Day on day, Cream audience). Vercel ser
 
 ## Monthly update
 
-Replace `config/plan.xlsx` with the new month's media plan. It must keep the "FInal" sheet with a `Mon'YY Plan` block, plus the "DOD" and "QL DOD" sheets.
+Replace `config/plan.xlsx` with the new month's media plan. It must keep the "FInal" sheet with a `Mon'YY Plan` block whose header row names the Cost, CPL, Leads, NOP and AFYP columns, plus the "DOD" and "QL DOD" sheets.
 
 ## Rules the numbers follow
 
 - Leads are dated by CRM lead creation date. Sales and APE are dated by payment date.
 - Source codes map to line items through `config/mapping.xlsx`. `config/overrides.json` moves NewBlank7 into Brand.
 - Daily and month-to-date targets follow the plan's daily curves: QL for leads, NOP for sales, APE for APE.
+- Spend targets come from the plan's Cost column, spread over days on the QL curve, so a day's target spend = its target leads × the plan CPL. Cost pacing = spend ÷ target spend.
 - Cream = income 10L+, salaried and graduate & above.
 
 ## Vercel settings

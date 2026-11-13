@@ -190,6 +190,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button type="button" class="am-tab" role="tab" data-tab="cream" aria-selected="false">Cream audience</button>
     <button type="button" class="am-tab" role="tab" data-tab="prospecting" aria-selected="false">Prospecting</button>
     <button type="button" class="am-tab" role="tab" data-tab="callcentre" aria-selected="false">Call centre</button>
+    <button type="button" class="am-tab" role="tab" data-tab="payments" aria-selected="false">Payments</button>
   </nav>
 
   <section id="overview" class="am-panel" role="tabpanel">
@@ -459,6 +460,89 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   </details>
 
   </section>
+
+  <section id="payments" class="am-panel" role="tabpanel" hidden>
+    <h2 class="am-h2">Payments</h2>
+    <p class="am-sub">From the Payment Report · transactions are payment attempts, so retries count as failures</p>
+    <div data-draw="py-root"></div>
+
+
+  <div class="am-controls"><label class="am-sub" style="margin:0" for="py-day">Day</label><select id="py-day" class="am-select"></select><span class="am-sub" style="margin:0">Compared with the median of the 7 days before it</span></div>
+
+  <section class="am-sec" style="margin-top:8px">
+    <h2 class="am-h2">Today's flags</h2>
+    <p class="am-sub">Raised when a segment moves past a threshold against its own last 7 days.</p>
+    <div class="am-card"><ul class="cc-flags" id="py-flags"></ul></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Overall</h2>
+    <div class="am-kpis cc-kpis" id="py-kpis"></div>
+  </section>
+
+  <section class="am-sec" id="py-yday">
+    <h2 class="am-h2" id="py-yd-title">Yesterday</h2>
+    <div class="am-card yd-card">
+      <div class="yd-head"><span class="yd-verdict" id="py-yd-verdict">—</span><p class="yd-lede" id="py-yd-lede">—</p></div>
+      <div class="yd-cols">
+        <div><div class="yd-h">What went wrong</div><ul class="yd-list" id="py-yd-bad"></ul></div>
+        <div><div class="yd-h">What held up</div><ul class="yd-list" id="py-yd-good"></ul></div>
+      </div>
+      <div class="yd-h" style="margin-top:14px">Check today</div><ul class="yd-list" id="py-yd-do"></ul>
+    </div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Segments</h2>
+    <p class="am-sub">Other = Overall minus Core, PR and SEO, which the report doesn't break out. Red or green when a number is meaningfully worse or better than that segment's last 7 days.</p>
+    <div class="am-mx-wrap" id="py-seg-table"></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Successful and failed payments by day</h2>
+    <div class="am-chips" id="py-bar-seg"></div>
+    <div class="am-card">
+      <div class="am-legend"><span><i style="background:var(--am-accent)"></i>Successful</span><span><i style="background:var(--color-bad)"></i>Failed · UPI</span><span><i style="background:#c46a2b"></i>Failed · credit card</span><span><i style="background:#c9c4b8"></i>Failed · debit card + net banking</span></div>
+      <div class="am-chart" id="py-bar-chart"></div>
+    </div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Trend</h2>
+    <div class="am-controls">
+      <div class="am-seg" id="py-tr-metric">
+        <button data-m="succ" aria-pressed="true">Success %</button><button data-m="upi_s" aria-pressed="false">UPI success</button><button data-m="cc_s" aria-pressed="false">Card success</button><button data-m="dcnb_s" aria-pressed="false">Debit + NB success</button><button data-m="upi_sh" aria-pressed="false">UPI share</button><button data-m="cc_sh" aria-pressed="false">Card share</button><button data-m="tx" aria-pressed="false">Transactions</button><button data-m="fail" aria-pressed="false">Failed</button>
+      </div>
+    </div>
+    <div class="am-chips" id="py-tr-seg"></div>
+    <div class="am-card"><div class="am-chart" id="py-tr-chart"></div></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">What the report says · 14 Oct – 12 Nov</h2>
+    <p class="am-sub">Structural findings from the first 30 days, written on 13 Nov. Cross-checked against the sales and call-centre data on this dashboard.</p>
+    <div class="cc-find">
+      <div class="am-card"><span class="am-dir up">Trend</span><h3>Success is up 4 pts, all from UPI</h3><p>Success rose from 75.7% (14–27 Oct) to 80.1% (29 Oct – 12 Nov). Breaking it down, the shift in payment mix added nothing; all of the gain is UPI working better (74% → 80%). UPI peaked at 86% on 1 Nov and has slipped back to about 78% since, so it's worth asking whether a gateway or app change happened around 20 Oct and what changed after 1 Nov.</p></div>
+      <div class="am-card"><span class="am-dir down">Leakage</span><h3>UPI is 79% of all failed payments</h3><p>About 80 payment attempts fail a day, 60 of them on UPI. Every point of UPI success is worth about 3 more successful payments a day. Failure reasons by UPI app (GPay, PhonePe, Paytm) and by error code would show whether it's user drop-off, bank declines or timeouts.</p></div>
+      <div class="am-card"><span class="am-dir down">Segment</span><h3>PR has the weakest checkout, and it's UPI</h3><p>PR succeeds 72.8% of the time against 86.3% for SEO. The whole gap is UPI (71.5% vs 86.1%); PR card payments succeed 90%. PR traffic is mostly Meta, and UPI app hand-off often breaks inside the Facebook and Instagram in-app browser. Worth testing a UPI QR or collect fallback, or opening checkout in the external browser. Matching SEO's UPI rate adds about 7 PR payments a day.</p></div>
+      <div class="am-card"><span class="am-dir down">Leakage</span><h3>Debit card and net banking fail half the time</h3><p>Debit card succeeds 50% and net banking 46%. They're 4% of attempts but 10% of failures. Typical causes are OTP or 3-D Secure drop-off and bank-side declines. Check bank-level failure codes before deciding whether to push these users to UPI or credit card.</p></div>
+      <div class="am-card"><span class="am-dir up">Mix</span><h3>Credit card share is rising, and card works</h3><p>Credit card went from 14% of attempts (week of 12 Oct) to 23% (week of 9 Nov), and it succeeds 87% of the time. For larger premiums, showing card or EMI first on the payment page could lift success further.</p></div>
+      <div class="am-card"><span class="am-dir warn">Link</span><h3>Payments follow the call centre</h3><p>Daily payment attempts move with call-centre connects (correlation 0.76). On 7–8 Nov, the dialer outage day and a half-staffed Sunday, attempts fell to 235–244 from 370–456 and successful payments dropped about 40%. Many payments are agent-assisted, so call-centre outages show up here the same day.</p></div>
+      <div class="am-card"><span class="am-dir flat">Coverage</span><h3>The report covers about 58% of tracker sales</h3><p>For 1–11 Nov it shows 3,071 successful payments against 5,333 sales on the tracker. Coverage is 86% for Core, 85% for PR and 65% for SEO. It probably counts only online checkout payments; worth confirming which journeys are in it before using it as a sales proxy.</p></div>
+      <div class="am-card"><span class="am-dir flat">Data</span><h3>Gaps to close with the client</h3><p>"Transactions" are attempts, so retries count as failures; a unique-customer success rate would show how many buyers are actually lost. Segment tabs run a day behind Overall (12 Nov shows 11 transactions against 400). About 70% of volume sits outside Core, PR and SEO; Brand, RM and Affiliate tabs would close that.</p></div>
+    </div>
+  </section>
+
+  <details class="am-notes">
+    <summary>How the numbers are built</summary>
+    <ul>
+      <li>Successful payments = transactions × success %, and the same for each method. Method attempts add up to total transactions, and method successes add up to total successes, on every row.</li>
+      <li>Card = credit card. Debit + NB combines debit card and net banking, which are too small to read alone.</li>
+      <li>A segment's day is marked incomplete when its transactions are under 30% of its usual, as on 12 Nov; flags skip it.</li>
+    </ul>
+  </details>
+
+  </section>
 </div>
 
 <script>
@@ -600,7 +684,7 @@ dash.calc('cream_period', {
 <script>
 (function () {
   const show = (tab) => {
-    if (!['overview', 'daily', 'cream', 'prospecting', 'callcentre'].includes(tab)) tab = 'overview';
+    if (!['overview', 'daily', 'cream', 'prospecting', 'callcentre', 'payments'].includes(tab)) tab = 'overview';
     window.amState.tab = tab;
     document.querySelectorAll('.am-panel').forEach((p) => { p.hidden = p.id !== tab; });
     document.querySelectorAll('.am-tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
@@ -612,7 +696,7 @@ dash.calc('cream_period', {
     if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({block: 'start'});
   }));
   const h = (location.hash || '').replace('#', '');
-  if (['daily', 'cream', 'overview', 'prospecting', 'callcentre'].includes(h)) show(h);
+  if (['daily', 'cream', 'overview', 'prospecting', 'callcentre', 'payments'].includes(h)) show(h);
 })();
 </script>
 
@@ -1593,6 +1677,217 @@ window.ccInit = function () {
 })();
 </script>
 <script>
+window.pyInit = function (D) {
+  const SEGS = ['Overall', 'PR', 'SEO', 'Core', 'Other'];
+  const inr = new Intl.NumberFormat('en-IN', {maximumFractionDigits: 0});
+  const F = {pct: (v, d = 1) => (v == null || isNaN(v) ? '—' : (v * 100).toFixed(d) + '%'), num: (v) => (v == null || isNaN(v) ? '—' : inr.format(v))};
+  const fd = (s) => d3.utcFormat('%a %-d %b')(new Date(s + 'T00:00:00Z'));
+  const R = (a, b) => (b > 0 ? a / b : null);
+  const rows = D.map((r) => Object.assign({}, r, {fail: r.tx - r.ok, succ: R(r.ok, r.tx), upi_s: R(r.upi_ok, r.upi_a), cc_s: R(r.cc_ok, r.cc_a), dc_s: R(r.dc_ok, r.dc_a), nb_s: R(r.nb_ok, r.nb_a),
+    dcnb_s: R(r.dc_ok + r.nb_ok, r.dc_a + r.nb_a), upi_sh: R(r.upi_a, r.tx), cc_sh: R(r.cc_a, r.tx), upi_f: r.upi_a - r.upi_ok, cc_f: r.cc_a - r.cc_ok, dcnb_f: r.dc_a + r.nb_a - r.dc_ok - r.nb_ok}));
+  const by = (seg) => rows.filter((r) => r.seg === seg).sort((a, b) => (a.date < b.date ? -1 : 1));
+  const get = (seg, d) => rows.find((r) => r.seg === seg && r.date === d);
+  const prior = (seg, d) => by(seg).filter((r) => r.date < d).slice(-7);
+  const base = (seg, d, k) => { const v = prior(seg, d).map((r) => r[k]).filter((x) => x != null); return v.length >= 3 ? d3.median(v) : null; };
+  const incomplete = (seg, d) => { if (seg === 'Other') return ['PR', 'SEO', 'Core'].some((s) => incomplete(s, d)); const r = get(seg, d), b = base(seg, d, 'tx'); return !!(r && b && r.tx < 0.3 * b); };
+  const dates = Array.from(new Set(rows.map((r) => r.date))).sort();
+  const M = {
+    tx: {l: 'Transactions', f: F.num, better: null}, ok: {l: 'Successful', f: F.num, better: 'up', rel: 0.15}, fail: {l: 'Failed', f: F.num, better: 'down', rel: 0.25},
+    succ: {l: 'Success %', f: (v) => F.pct(v), better: 'up', abs: 0.03}, upi_sh: {l: 'UPI share', f: (v) => F.pct(v, 0), better: null}, upi_s: {l: 'UPI success', f: (v) => F.pct(v), better: 'up', abs: 0.03},
+    cc_sh: {l: 'Card share', f: (v) => F.pct(v, 0), better: null}, cc_s: {l: 'Card success', f: (v) => F.pct(v), better: 'up', abs: 0.05}, dcnb_s: {l: 'Debit + NB success', f: (v) => F.pct(v, 0), better: 'up', abs: 0.15},
+    dc_s: {l: 'Debit success', f: (v) => F.pct(v, 0), better: 'up', abs: 0.15}, nb_s: {l: 'NB success', f: (v) => F.pct(v, 0), better: 'up', abs: 0.2}
+  };
+  const tone = (k, v, b) => { const m = M[k]; if (!m || !m.better || v == null || b == null) return ''; const diff = v - b; const big = m.abs != null ? Math.abs(diff) >= m.abs : Math.abs(diff) >= m.rel * Math.abs(b); if (!big) return ''; return (m.better === 'up') === (diff > 0) ? 'ok' : 'bad'; };
+  const chg = (k, v, b) => { const m = M[k]; if (v == null || b == null) return ''; if (m.abs != null || /_sh$/.test(k)) { const p = (v - b) * 100; return (p > 0 ? '+' : '') + p.toFixed(1) + ' pts'; } const r = b ? v / b - 1 : null; return r == null ? '' : (r > 0 ? '+' : '') + (r * 100).toFixed(0) + '%'; };
+  const state = {day: dates[dates.length - 1], bar: 'Overall', tr: 'Overall', m: 'succ'};
+  const sel = document.getElementById('py-day'); sel.replaceChildren(); for (const d of dates.slice().reverse()) sel.append(new Option(fd(d), d)); sel.value = state.day;
+
+  function flags() {
+    const ul = document.getElementById('py-flags'); ul.replaceChildren(); const out = [];
+    for (const seg of SEGS) {
+      const r = get(seg, state.day); if (!r) continue; const b = (k) => base(seg, state.day, k);
+      if (incomplete(seg, state.day)) { out.push(['flat', 'Incomplete', seg === 'Other' ? 'Other: worked out as Overall minus the segment tabs, so it reads high until they catch up.' : `${seg}: only ${F.num(r.tx)} transaction${r.tx === 1 ? '' : 's'} against ${F.num(b('tx'))} usual. The segment tab hasn't caught up for this day.`]); continue; }
+      if (seg === 'Overall') { const worst = [['UPI', r.upi_f], ['credit card', r.cc_f], ['debit card + net banking', r.dcnb_f]].sort((x, y) => y[1] - x[1])[0];
+        out.push([r.succ < b('succ') - 0.03 ? 'down' : 'flat', 'Failed', `Overall: ${F.num(r.fail)} of ${F.num(r.tx)} payment attempts failed (${F.pct(1 - r.succ)}); ${F.num(worst[1])} of them on ${worst[0]}.`]); }
+      if (b('tx') && r.tx < 0.75 * b('tx')) out.push(['down', 'Volume', `${seg}: ${F.num(r.tx)} payment attempts vs ${F.num(b('tx'))} usual (${chg('tx', r.tx, b('tx'))}). Check call-centre staffing and connects for the same day.`]);
+      if (b('succ') != null && r.succ <= b('succ') - 0.03) out.push(['down', 'Success', `${seg}: success ${F.pct(r.succ)} vs ${F.pct(b('succ'))} usual.`]);
+      else if (b('succ') != null && r.succ >= b('succ') + 0.04 && r.tx >= 30) out.push(['up', 'Success', `${seg}: success ${F.pct(r.succ)} vs ${F.pct(b('succ'))} usual.`]);
+      if (b('upi_s') != null && r.upi_a >= 20 && r.upi_s <= b('upi_s') - 0.04) out.push(['down', 'UPI', `${seg}: UPI success ${F.pct(r.upi_s)} vs ${F.pct(b('upi_s'))} usual, on ${F.num(r.upi_a)} attempts.`]);
+      if (b('cc_s') != null && r.cc_a >= 20 && r.cc_s <= b('cc_s') - 0.06) out.push(['down', 'Card', `${seg}: card success ${F.pct(r.cc_s)} vs ${F.pct(b('cc_s'))} usual, on ${F.num(r.cc_a)} attempts.`]);
+      if (seg === 'Overall' && r.dc_a + r.nb_a >= 8 && r.dcnb_s != null && r.dcnb_s < 0.45) out.push(['warn', 'Debit + NB', `Overall: debit card and net banking succeeded ${F.pct(r.dcnb_s, 0)} (${r.dc_ok + r.nb_ok} of ${r.dc_a + r.nb_a}).`]);
+      if (seg === 'PR' && r.upi_s != null && r.upi_a >= 20) { const seo = get('SEO', state.day); if (seo && seo.upi_s != null && !incomplete('SEO', state.day) && seo.upi_s - r.upi_s >= 0.1) out.push(['warn', 'PR vs SEO', `PR UPI success ${F.pct(r.upi_s)} vs ${F.pct(seo.upi_s)} for SEO. Likely the in-app browser hand-off on Meta traffic.`]); }
+    }
+    for (const [t, tag, txt] of out) { const li = document.createElement('li'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = tag; const p = document.createElement('span'); p.textContent = txt; li.append(s, p); ul.append(li); }
+  }
+
+  function kpis() {
+    const el = document.getElementById('py-kpis'); el.replaceChildren(); const r = get('Overall', state.day);
+    for (const k of ['tx', 'ok', 'succ', 'fail', 'upi_sh', 'upi_s', 'cc_s', 'dcnb_s']) {
+      const b = base('Overall', state.day, k), v = r ? r[k] : null;
+      const c = document.createElement('div'); c.className = 'am-card am-kpi';
+      const l = document.createElement('div'); l.className = 'am-kpi-label'; l.textContent = M[k].l;
+      const val = document.createElement('div'); val.className = 'am-kpi-val'; val.textContent = M[k].f(v);
+      const meta = document.createElement('div'); meta.className = 'am-kpi-meta';
+      if (b != null && v != null) { const p = document.createElement('span'); const t = tone(k, v, b); p.className = 'am-dir ' + (t === 'ok' ? 'up' : t === 'bad' ? 'down' : 'flat'); p.textContent = chg(k, v, b) || '0'; meta.append(p, document.createTextNode(' 7-day ' + M[k].f(b))); }
+      c.append(l, val, meta); el.append(c);
+    }
+  }
+
+  function segTable() {
+    const el = document.getElementById('py-seg-table');
+    const cols = ['tx', 'ok', 'fail', 'succ', 'upi_sh', 'upi_s', 'cc_sh', 'cc_s', 'dc_s', 'nb_s'];
+    const t = document.createElement('table'); t.className = 'am-mx'; const th = document.createElement('thead'), hr = document.createElement('tr');
+    const h0 = document.createElement('th'); h0.className = 'am-stick'; h0.textContent = 'Segment'; hr.append(h0);
+    for (const k of cols) { const h = document.createElement('th'); h.textContent = M[k].l; hr.append(h); }
+    th.append(hr); t.append(th); const tb = document.createElement('tbody');
+    for (const seg of SEGS) { const r = get(seg, state.day); if (!r) continue; const inc = incomplete(seg, state.day); const tr = document.createElement('tr'); if (seg === 'Overall') tr.className = 'cc-total';
+      const c0 = document.createElement('td'); c0.className = 'am-stick'; c0.textContent = seg + (inc ? ' · incomplete' : ''); if (inc) c0.style.color = 'var(--color-fg-muted)'; tr.append(c0);
+      for (const k of cols) { const td = document.createElement('td'); const v = r[k], b = base(seg, state.day, k); td.textContent = M[k].f(v); if (inc) td.className = 'am-tgt'; else { const tn = tone(k, v, b); if (tn) td.className = 'am-c-' + tn; } if (b != null) td.title = '7-day median ' + M[k].f(b); tr.append(td); }
+      tb.append(tr); }
+    t.append(tb); el.replaceChildren(t);
+  }
+
+  function chips(id, key, redraw) { const el = document.getElementById(id); el.replaceChildren();
+    for (const s of SEGS) { const b = document.createElement('button'); b.className = 'am-chip'; b.textContent = s; b.setAttribute('aria-pressed', String(state[key] === s)); b.onclick = () => { state[key] = s; chips(id, key, redraw); redraw(); }; el.append(b); } }
+  function tip(el) { const t = document.createElement('div'); t.className = 'am-tip'; el.append(t); return t; }
+  function showTip(t, x, W, lines) { t.replaceChildren(); const b = document.createElement('b'); b.textContent = lines[0]; t.append(b); for (const l of lines.slice(1)) { const s = document.createElement('span'); s.textContent = l; t.append(s, document.createElement('br')); } t.style.opacity = 1; t.style.left = Math.max(80, Math.min(x, W - 80)) + 'px'; t.style.top = '40px'; }
+  const axes = (svg, x, y, W, Hh, m, yf, xf, xt) => {
+    svg.append('g').selectAll('line').data(y.ticks(4)).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y).attr('y2', y).style('stroke', 'var(--cds-chart-grid)');
+    const ya = svg.append('g').attr('transform', `translate(${m.l - 4},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(yf)); ya.select('.domain').remove();
+    const xa = svg.append('g').attr('transform', `translate(0,${Hh - m.b})`).call(xt ? d3.axisBottom(x).tickValues(xt).tickSize(0).tickFormat(xf) : d3.axisBottom(x).ticks(Math.max(3, Math.floor(W / 90))).tickSize(0).tickFormat(xf)); xa.select('.domain').remove();
+    svg.selectAll('.tick text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+  };
+
+  function bars() {
+    const el = document.getElementById('py-bar-chart'); el.replaceChildren();
+    const data = by(state.bar); const W = el.clientWidth || 700, Hh = 240, m = {t: 10, r: 8, b: 24, l: 40};
+    const svg = d3.select(el).append('svg').attr('width', W).attr('height', Hh).attr('role', 'img').attr('aria-label', 'Successful and failed payments by day, ' + state.bar);
+    const x = d3.scaleBand().domain(data.map((r) => r.date)).range([m.l, W - m.r]).padding(0.15), y = d3.scaleLinear().domain([0, d3.max(data, (r) => r.tx) || 1]).nice().range([Hh - m.b, m.t]);
+    const step = Math.ceil(data.length / Math.max(2, Math.floor((W - m.l) / 64)));
+    axes(svg, x, y, W, Hh, m, F.num, (s) => d3.utcFormat('%-d %b')(new Date(s + 'T00:00:00Z')), data.map((r) => r.date).filter((_, i) => i % step === 0));
+    for (const r of data) { let y0 = y(0); for (const [k, c] of [['ok', 'var(--am-accent)'], ['upi_f', 'var(--color-bad)'], ['cc_f', '#c46a2b'], ['dcnb_f', '#c9c4b8']]) { const h = y(0) - y(r[k]); svg.append('rect').attr('x', x(r.date)).attr('width', x.bandwidth()).attr('y', y0 - h).attr('height', Math.max(0, h)).style('fill', c).style('opacity', r.date === state.day ? 1 : 0.85); y0 -= h; } }
+    const t = tip(el);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', Hh - m.t - m.b).attr('fill', 'transparent').on('pointermove pointerdown', (ev) => {
+      const px = d3.pointer(ev, svg.node())[0]; const i = Math.max(0, Math.min(data.length - 1, Math.floor((px - m.l) / x.step()))); const r = data[i];
+      showTip(t, x(r.date), W, [fd(r.date) + ' · ' + F.num(r.tx) + ' attempts', 'Successful ' + F.num(r.ok) + ' (' + F.pct(r.succ) + ')', 'Failed on UPI ' + F.num(r.upi_f), 'Failed on card ' + F.num(r.cc_f), 'Failed on debit + NB ' + F.num(r.dcnb_f)]); })
+      .on('pointerleave', () => { t.style.opacity = 0; });
+  }
+
+  function trend() {
+    const el = document.getElementById('py-tr-chart'); el.replaceChildren(); const k = state.m;
+    const pts = by(state.tr).filter((r) => r[k] != null && !incomplete(state.tr, r.date)).map((r) => ({x: new Date(r.date + 'T00:00:00Z'), y: r[k], d: r.date}));
+    const W = el.clientWidth || 700, Hh = 240, m = {t: 12, r: 12, b: 24, l: 48};
+    const svg = d3.select(el).append('svg').attr('width', W).attr('height', Hh).attr('role', 'img').attr('aria-label', M[k].l + ' by day, ' + state.tr);
+    const y = d3.scaleLinear().domain([0, (d3.max(pts, (p) => p.y) || 1) * 1.08]).nice().range([Hh - m.b, m.t]); if (/_s$|succ/.test(k)) y.domain([Math.max(0, Math.floor(((d3.min(pts, (p) => p.y) || 0) - 0.08) * 10) / 10), Math.min(1, (d3.max(pts, (p) => p.y) || 1) + 0.03)]).nice();
+    const x = d3.scaleUtc().domain(d3.extent(pts, (p) => p.x)).range([m.l, W - m.r]);
+    axes(svg, x, y, W, Hh, m, M[k].f, d3.utcFormat('%-d %b'));
+    svg.append('path').datum(pts).attr('fill', 'none').style('stroke', 'var(--am-accent)').attr('stroke-width', 2).attr('d', d3.line().x((p) => x(p.x)).y((p) => y(p.y)));
+    svg.selectAll('circle.pt').data(pts).join('circle').attr('class', 'pt').attr('r', (p) => (p.d === state.day ? 4.5 : 2.5)).attr('cx', (p) => x(p.x)).attr('cy', (p) => y(p.y)).style('fill', (p) => (p.d === state.day ? 'var(--color-fg)' : 'var(--am-accent)'));
+    const t = tip(el);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', Hh - m.t - m.b).attr('fill', 'transparent').on('pointermove pointerdown', (ev) => {
+      const tx = x.invert(d3.pointer(ev, svg.node())[0]); const p = pts.reduce((a, b) => (Math.abs(b.x - tx) < Math.abs(a.x - tx) ? b : a)); const r = get(state.tr, p.d);
+      showTip(t, x(p.x), W, [fd(p.d), M[k].l + ': ' + M[k].f(p.y), F.num(r.tx) + ' attempts']); }).on('pointerleave', () => { t.style.opacity = 0; });
+  }
+
+  document.querySelectorAll('#py-tr-metric button').forEach((b) => (b.onclick = () => { state.m = b.dataset.m; document.querySelectorAll('#py-tr-metric button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); trend(); }));
+  sel.onchange = () => { state.day = sel.value; all(); };
+  function all() { flags(); kpis(); window.pyYday(D, window.pyCC(), state.day); segTable(); bars(); trend(); }
+  chips('py-bar-seg', 'bar', bars); chips('py-tr-seg', 'tr', trend);
+  all();
+  window.pyRedraw = () => { bars(); trend(); };
+};
+
+window.pyYday = function (D, CC, day) {
+  const inr = new Intl.NumberFormat('en-IN', {maximumFractionDigits: 0});
+  const n = (v) => inr.format(Math.round(v)), p = (v, d = 1) => (v * 100).toFixed(d) + '%', pts = (v) => (v > 0 ? '+' : '−') + Math.abs(v * 100).toFixed(1) + ' pts';
+  const R = (a, b) => (b > 0 ? a / b : null);
+  const fd = (s) => d3.utcFormat('%A %-d %b')(new Date(s + 'T00:00:00Z'));
+  const seg = (s) => D.filter((r) => r.seg === s).sort((a, b) => (a.date < b.date ? -1 : 1));
+  const med = (rows, f) => { const v = rows.map(f).filter((x) => x != null && isFinite(x)); return v.length ? d3.median(v) : null; };
+  const M = ['upi', 'cc', 'dc', 'nb'], NAME = {upi: 'UPI', cc: 'credit card', dc: 'debit card', nb: 'net banking'};
+  const o = seg('Overall'), r = o.find((x) => x.date === day), prev = o.filter((x) => x.date < day).slice(-7);
+  const el = (id) => document.getElementById(id);
+  const latest = d3.max(D, (x) => x.date); document.getElementById('py-yd-title').textContent = (day === latest ? 'Yesterday · ' : 'Day in brief · ') + fd(day);
+  const bad = [], good = [], todo = [];
+  if (!r || prev.length < 3) { el('py-yd-verdict').textContent = 'No baseline'; el('py-yd-lede').textContent = 'Not enough earlier days to compare.'; return; }
+  const bTx = med(prev, (x) => x.tx), bS = med(prev, (x) => R(x.ok, x.tx)), bOk = med(prev, (x) => x.ok);
+  const s = R(r.ok, r.tx);
+  // method rates and shares vs baseline, pooled over the 7 days
+  const pool = (k) => d3.sum(prev, (x) => x[k]);
+  const sh = (m, x) => R(x[m + '_a'], x.tx), rt = (m, x) => R(x[m + '_ok'], x[m + '_a']);
+  const bSh = Object.fromEntries(M.map((m) => [m, R(pool(m + '_a'), pool('tx'))])), bRt = Object.fromEntries(M.map((m) => [m, R(pool(m + '_ok'), pool(m + '_a'))]));
+  const rateEff = Object.fromEntries(M.map((m) => [m, (sh(m, r) || 0) * ((rt(m, r) ?? bRt[m]) - bRt[m])]));
+  const mixEff = d3.sum(M, (m) => ((sh(m, r) || 0) - bSh[m]) * bRt[m]);
+  const lostRate = Math.max(0, (bS - s) * r.tx), lostVol = Math.max(0, (bTx - r.tx) * bS);
+  // call centre same day
+  const c = CC.find((x) => x.date === day), cPrev = CC.filter((x) => x.date < day).slice(-7);
+  const cAg = med(cPrev, (x) => x.agents), cCpa = med(cPrev, (x) => x.calls_pa), cCon = med(cPrev, (x) => x.connects);
+  let ccCause = null;
+  if (c && cCpa && c.calls_pa < 0.7 * cCpa && c.login >= 0.9 * med(cPrev, (x) => x.login)) ccCause = `the call centre had a dialer or system problem: agents logged in as usual but made ${n(c.calls_pa)} calls each against ${n(cCpa)}, so connects fell to ${n(c.connects)} from ${n(cCon)}`;
+  else if (c && cAg && c.agents < 0.85 * cAg) ccCause = `the call centre ran short: ${n(c.agents)} agents against ${n(cAg)} usual, and connects fell to ${n(c.connects)} from ${n(cCon)}`;
+  else if (c && cCon && c.connects < 0.85 * cCon) ccCause = `call-centre connects fell to ${n(c.connects)} from ${n(cCon)}`;
+
+  // volume
+  let sev = 0;
+  if (r.tx < 0.75 * bTx) { sev = 2; bad.push(`<b>Payment attempts fell to ${n(r.tx)}</b> against ${n(bTx)} usual (${pts((r.tx - bTx) / bTx).replace(' pts', '%').replace(/(\d)\.(\d)%/, '$1%')}). That's about ${n(lostVol)} fewer successful payments from volume alone. ${ccCause ? 'Likely cause: ' + ccCause + '.' : 'The call centre looked normal, so check site traffic and lead volume.'}`); todo.push(ccCause ? 'Confirm the call-centre issue is fixed and that yesterday\'s unpaid quotes are being called back.' : 'Check lead volume and the payment page for errors yesterday.'); }
+  else if (r.tx < 0.85 * bTx) { sev = Math.max(sev, 1); bad.push(`<b>Payment attempts were light:</b> ${n(r.tx)} against ${n(bTx)} usual.${ccCause ? ' ' + ccCause.charAt(0).toUpperCase() + ccCause.slice(1) + '.' : ''}`); }
+  else good.push(`Volume: ${n(r.tx)} payment attempts against ${n(bTx)} usual${r.tx > 1.15 * bTx ? ' (a strong day)' : ''}.`);
+  // success
+  if (s <= bS - 0.03) {
+    sev = 2;
+    const worst = M.slice().sort((a, b) => rateEff[a] - rateEff[b])[0];
+    const why = rateEff[worst] < -0.01 ? `Most of the drop is ${NAME[worst]}: ${p(rt(worst, r))} success against ${p(bRt[worst])} usual on ${n(r[worst + '_a'])} attempts.` : mixEff < -0.01 ? `It's the payment mix: more attempts went to weaker methods (UPI share ${p(sh('upi', r), 0)} against ${p(bSh.upi, 0)}).` : 'No single method explains it.';
+    bad.push(`<b>Success fell to ${p(s)}</b> against ${p(bS)} usual, about ${n(lostRate)} extra failed payments. ${why}`);
+    todo.push(`Ask the payments team for ${NAME[worst]} failure codes for yesterday.`);
+  } else if (s <= bS - 0.015) { sev = Math.max(sev, 1); bad.push(`<b>Success slipped to ${p(s)}</b> against ${p(bS)} usual, about ${n(lostRate)} extra failed payments.`); }
+  else good.push(`Success: ${p(s)} against ${p(bS)} usual.`);
+  // methods
+  for (const m of ['upi', 'cc']) {
+    const v = rt(m, r); if (v == null || r[m + '_a'] < 20) continue;
+    const th = m === 'upi' ? 0.03 : 0.05;
+    if (v <= bRt[m] - th && !bad.some((x) => x.includes(NAME[m] + ':'))) { sev = Math.max(sev, 1); bad.push(`<b>${NAME[m] === 'UPI' ? 'UPI' : 'Card'} success ${p(v)}</b> against ${p(bRt[m])} usual on ${n(r[m + '_a'])} attempts: ${n((bRt[m] - v) * r[m + '_a'])} extra failures.`); }
+    else if (v >= bRt[m] - (m === 'upi' ? 0.015 : 0.025)) good.push(`${m === 'upi' ? 'UPI' : 'Credit card'}: ${p(v)} success on ${n(r[m + '_a'])} attempts (usual ${p(bRt[m])}).`);
+  }
+  const dn = r.dc_a + r.nb_a, dnOk = r.dc_ok + r.nb_ok;
+  if (dn >= 15 && dnOk / dn < 0.4) { sev = Math.max(sev, 1); bad.push(`<b>Debit card and net banking failed badly:</b> ${dnOk} of ${dn} succeeded.`); }
+  // segments (complete ones only)
+  const segNotes = [];
+  for (const sg of ['PR', 'SEO', 'Core', 'Other']) {
+    const rows = seg(sg), x = rows.find((y) => y.date === day), pv = rows.filter((y) => y.date < day).slice(-7); if (!x || pv.length < 3) continue;
+    const bt = med(pv, (y) => y.tx); if (x.tx < 0.3 * bt) { segNotes.push(sg); continue; }
+    const bs = med(pv, (y) => R(y.ok, y.tx)), xs = R(x.ok, x.tx);
+    if (x.tx >= 25 && xs <= bs - 0.05) { sev = Math.max(sev, 1); bad.push(`<b>${sg} success ${p(xs)}</b> against ${p(bs)} usual (${n(x.tx - x.ok)} failed of ${n(x.tx)}).${sg === 'PR' ? ' On Meta traffic this is usually UPI hand-off in the in-app browser.' : ''}`); }
+  }
+  if (segNotes.length) todo.push(`${segNotes.join(', ')} ${segNotes.length > 1 ? 'tabs haven\'t' : 'tab hasn\'t'} caught up for ${d3.utcFormat('%-d %b')(new Date(day + 'T00:00:00Z'))} yet; read segment numbers again tomorrow.`);
+  if (c && ccCause && r.tx >= 0.85 * bTx) todo.push('The call centre had a weak day (' + ccCause + ') but payments held; worth watching today.');
+  // verdict
+  const V = sev === 2 ? ['down', 'Went bad'] : sev === 1 ? ['warn', 'Watch'] : ['up', 'Business as usual'];
+  el('py-yd-verdict').className = 'yd-verdict am-dir ' + V[0]; el('py-yd-verdict').textContent = V[1];
+  el('py-yd-lede').textContent = `${n(r.tx)} payment attempts, ${n(r.ok)} successful (${p(s)}). Usual is ${n(bTx)} attempts and ${n(bOk)} successful at ${p(bS)}.` + (sev === 0 ? ' Nothing moved outside its normal range.' : '');
+  const fill = (id, arr, empty) => { const ul = el(id); ul.replaceChildren(); (arr.length ? arr : [empty]).forEach((t) => { const li = document.createElement('li'); const tmp = document.createElement('div'); tmp.innerHTML = t; li.append(...tmp.childNodes); ul.append(li); }); };
+  fill('py-yd-bad', bad, 'Nothing. Every check was within its normal range.');
+  fill('py-yd-good', good, 'Nothing stayed in its normal range.');
+  if (!todo.length) todo.push(sev === 0 ? 'No action needed.' : 'Keep an eye on the same numbers today.');
+  fill('py-yd-do', todo, '');
+};
+
+window.pyCC = function () {
+  const c = dash.data('cc_daily');
+  if (c.status !== 'ok' || !c.data) return [];
+  return c.data.filter((r) => r.seg === 'Overall').map((r) => ({date: r.date, agents: r.agents, login: r.login, calls_pa: r.calls_pa, connect: r.connect, connects: Math.round(r.calls_pa * r.agents * r.connect), idle_rate: r.idle_rate, util: r.util}));
+};
+(function () {
+  let done = false, lastW = 0;
+  dash.draw('py-root', () => {
+    const d = dash.data('pay_daily');
+    if (d.status !== 'ok' || !d.data) return;
+    const w = document.getElementById('payments').clientWidth;
+    if (!done) { done = true; lastW = w; window.pyInit(d.data); }
+    else if (w !== lastW) { lastW = w; window.pyRedraw(); }
+  });
+})();
+</script>
+<script>
 window.__amDataP = fetch('data.json', {cache: 'no-store'})
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(function (p) { window.__amLoad(p); })
@@ -1611,6 +1906,13 @@ Promise.all([
   window.__amDataP.catch(function () {})
 ]).then(function (res) { window.__amLoad(res[0]); })
   .catch(function (e) { window.__ccError = String(e); dash.draw('cc-asof'); });
+</script>
+<script>
+Promise.all([
+  fetch('payments.json', {cache: 'no-store'}).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }),
+  window.__amDataP.catch(function () {})
+]).then(function (res) { window.__amLoad(res[0]); })
+  .catch(function (e) { window.__pyError = String(e); });
 </script>
 </body>
 </html>

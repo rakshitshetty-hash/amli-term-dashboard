@@ -1,6 +1,6 @@
 # AMLI Term – daily performance dashboard
 
-A static site with five tabs (Overview, Day on day, Cream audience, Prospecting, Call centre). Vercel serves `public/`. The first three tabs read `public/data.json`, which `scripts/process.py` rebuilds each day. The Prospecting tab reads `public/prospecting.json`, which `scripts/prospecting.py` builds from the GA4 consolidated report.
+A static site with six tabs (Overview, Day on day, Cream audience, Prospecting, Call centre, Payments). Vercel serves `public/`. The first three tabs read `public/data.json`, which `scripts/process.py` rebuilds each day. The Prospecting tab reads `public/prospecting.json`, which `scripts/prospecting.py` builds from the GA4 consolidated report.
 
 ## Daily update
 
@@ -39,6 +39,16 @@ python3 scripts/callcentre.py --report <Call Centre report .xlsx> --out public/c
 ```
 
 Then commit and push. The tab compares each day with the median of the 7 days before it, for each segment (Overall, Top Funnel, SEM Core, Vernac, Bottom Funnel, Affiliate). Ready time = login − not-ready; true utilisation = (talk + dial) ÷ ready time; idle rate = idle ÷ ready time; connects per agent = calls per agent × Connect%. Undialled = leads still open with no dial; closed, no dial = leads closed with no dial. Flags fire on: calls per agent under 70% of usual with normal logins and idle up 8+ pts (system issue), agents down 15%+, undialled 5%+, closed with no dial 15%+, idle 25%+, Connect% down 1.5+ pts, wrap per connected call up 30%+. The findings cards are text written on 13 Nov from the 14 Oct – 12 Nov report and don't update.
+
+## Payments tab update
+
+Export the "Payment Report" Google Sheet as `.xlsx`, then run:
+
+```
+python3 scripts/payments.py --report <Payment Report .xlsx> --out public/payments.json
+```
+
+Then commit and push. Successful payments = transactions × success %, and the same for each method. "Other" = Overall minus Core, PR and SEO. A segment's day is marked incomplete when its transactions are under 30% of its 7-day median. The Yesterday section also reads the call-centre data, so refresh `callcentre.json` on the same day to explain volume drops.
 
 ## Monthly update
 

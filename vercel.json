@@ -12,6 +12,15 @@
       ]
     },
     {
+      "source": "/payments.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
       "source": "/callcentre.json",
       "headers": [
         {

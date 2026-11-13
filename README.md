@@ -1,6 +1,6 @@
 # AMLI Term – daily performance dashboard
 
-A static site with four tabs (Overview, Day on day, Cream audience, Prospecting). Vercel serves `public/`. The first three tabs read `public/data.json`, which `scripts/process.py` rebuilds each day. The Prospecting tab reads `public/prospecting.json`, which `scripts/prospecting.py` builds from the GA4 consolidated report.
+A static site with five tabs (Overview, Day on day, Cream audience, Prospecting, Call centre). Vercel serves `public/`. The first three tabs read `public/data.json`, which `scripts/process.py` rebuilds each day. The Prospecting tab reads `public/prospecting.json`, which `scripts/prospecting.py` builds from the GA4 consolidated report.
 
 ## Daily update
 
@@ -29,6 +29,16 @@ python3 scripts/prospecting.py --report <GA4 consolidated .xlsb> --out public/pr
 ```
 
 Then commit and push. The tab covers Meta and Google rows with Theme1 = Prospecting and shows CPL (Spend ÷ Leads), QL% (QL ÷ Leads) and CPQQG (Spend ÷ QQ-G), MTD against the same days last month. Creative attributes (format, partner, language, creator type, launch date) are read from the Meta ad naming convention. The "What to do" list is worked out on the page: line items against their channel's CPQQG (Efficient ≤ 0.9×, Expensive ≥ 1.2×), Meta ads with ₹1L+ spend in the last 14 days against the Meta CPQQG (Scale ≤ 0.8×, Pause ≥ 1.5× or no QQ-G).
+
+## Call centre tab update
+
+Export the "Call Centre report" Google Sheet as `.xlsx` (File → Download → Microsoft Excel), then run:
+
+```
+python3 scripts/callcentre.py --report <Call Centre report .xlsx> --out public/callcentre.json
+```
+
+Then commit and push. The tab compares each day with the median of the 7 days before it, for each segment (Overall, Top Funnel, SEM Core, Vernac, Bottom Funnel, Affiliate). Ready time = login − not-ready; true utilisation = (talk + dial) ÷ ready time; idle rate = idle ÷ ready time; connects per agent = calls per agent × Connect%. Undialled = leads still open with no dial; closed, no dial = leads closed with no dial. Flags fire on: calls per agent under 70% of usual with normal logins and idle up 8+ pts (system issue), agents down 15%+, undialled 5%+, closed with no dial 15%+, idle 25%+, Connect% down 1.5+ pts, wrap per connected call up 30%+. The findings cards are text written on 13 Nov from the 14 Oct – 12 Nov report and don't update.
 
 ## Monthly update
 

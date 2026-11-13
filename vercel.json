@@ -12,6 +12,15 @@
       ]
     },
     {
+      "source": "/callcentre.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
       "source": "/prospecting.json",
       "headers": [
         {

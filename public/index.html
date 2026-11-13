@@ -189,6 +189,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button type="button" class="am-tab" role="tab" data-tab="daily" aria-selected="false">Day on day</button>
     <button type="button" class="am-tab" role="tab" data-tab="cream" aria-selected="false">Cream audience</button>
     <button type="button" class="am-tab" role="tab" data-tab="prospecting" aria-selected="false">Prospecting</button>
+    <button type="button" class="am-tab" role="tab" data-tab="callcentre" aria-selected="false">Call centre</button>
   </nav>
 
   <section id="overview" class="am-panel" role="tabpanel">
@@ -371,6 +372,81 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       </div>
     </div>
   </section>
+
+  <section id="callcentre" class="am-panel" role="tabpanel" hidden>
+    <h2 class="am-h2">Call centre</h2>
+    <p class="am-sub" data-draw="cc-asof">—</p>
+    <div data-draw="cc-root"></div>
+
+
+  <div class="am-controls"><label class="am-sub" style="margin:0" for="cc-day">Day</label><select id="cc-day" class="am-select"></select><span class="am-sub" style="margin:0">Compared with the median of the 7 days before it</span></div>
+
+  <section class="am-sec" style="margin-top:8px" id="cc-flag-sec">
+    <h2 class="am-h2">Today's flags</h2>
+    <p class="am-sub">Raised automatically when a segment moves past a threshold against its own last 7 days.</p>
+    <div class="am-card"><ul class="cc-flags" id="cc-flags"></ul></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Overall</h2>
+    <div class="am-kpis cc-kpis" id="cc-kpis"></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Segments</h2>
+    <p class="am-sub">Red or green when a number is meaningfully worse or better than that segment's last 7 days. Undialled = leads still open and never dialled.</p>
+    <div class="am-mx-wrap" id="cc-seg-table"></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Where leads go undialled · by creation hour</h2>
+    <p class="am-sub" id="cc-leak-sub"></p>
+    <div class="am-chips" id="cc-leak-seg"></div>
+    <div class="am-card">
+      <div class="am-legend"><span><i style="background:var(--am-accent)"></i>Dialled</span><span><i style="background:#c9c4b8"></i>Closed, never dialled</span><span><i style="background:var(--color-bad)"></i>Open, never dialled</span></div>
+      <div class="am-chart" id="cc-leak-chart"></div>
+    </div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">Trend</h2>
+    <div class="am-controls">
+      <div class="am-seg" id="cc-tr-metric">
+        <button data-m="connect" aria-pressed="true">Connect%</button><button data-m="conn_pa" aria-pressed="false">Connects / agent</button><button data-m="calls_pa" aria-pressed="false">Calls / agent</button><button data-m="util" aria-pressed="false">True utilisation</button><button data-m="idle_rate" aria-pressed="false">Idle rate</button><button data-m="agents" aria-pressed="false">Agents</button><button data-m="att_min" aria-pressed="false">Avg talk time</button><button data-m="wrap_conn_s" aria-pressed="false">Wrap / connect</button><button data-m="und_pct" aria-pressed="false">Undialled %</button>
+      </div>
+    </div>
+    <div class="am-chips" id="cc-tr-seg"></div>
+    <div class="am-card"><div class="am-chart" id="cc-tr-chart"></div></div>
+  </section>
+
+  <section class="am-sec">
+    <h2 class="am-h2">What the report says · 14 Oct – 12 Nov</h2>
+    <p class="am-sub">Structural findings from the first 30 days of this report, written on 13 Nov. The flags above track them day by day.</p>
+    <div class="cc-find">
+      <div class="am-card"><span class="am-dir down">Leakage</span><h3>The 7–9 pm dead zone</h3><p>12% of leads arrive between 7 and 9 pm. On a normal weekday 14% of them are never dialled, about 230 leads a day, against 2–3% at every other hour. Leads after 9 pm roll into the next day's queue and get dialled; 7–9 pm leads don't. Fix: move the business-date cut-off to 7 pm, or keep a late shift until 9 pm.</p></div>
+      <div class="am-card"><span class="am-dir down">Leakage</span><h3>1 in 10 leads is closed without a single dial</h3><p>10.6% of leads close with no dial attempt, 15–25% in Bottom Funnel (24.6% on 12 Nov). These are likely duplicates, existing customers or auto-closures, but the report doesn't say. Ask for a closure reason; if they are dupes, the media lead count is overstated by the same share.</p></div>
+      <div class="am-card"><span class="am-dir down">Capacity</span><h3>Vernac is falling behind</h3><p>Since 8 Nov, 7–10% of Vernac leads (about 270 a day) stay open and undialled, against under 1% on 3–5 Nov. Agents fell from 58–59 to 44–54 while leads held at 2.7–3.5K, and calls per agent dropped from 320–380 to 265–290 on 9–11 Nov. Vernac also has the longest talk time (3.1 min) and lowest connect (16.5%), so it needs the most agent time per lead.</p></div>
+      <div class="am-card"><span class="am-dir warn">Capacity</span><h3>SEM Core is overstaffed</h3><p>SEM Core runs a 28% idle rate (others 12–17%) on 42 leads per agent (others about 55). When it ran 14–16 agents on 10–12 Nov, idle fell to 15–23% with no extra undialled leads. About 4 agents could move to Vernac.</p></div>
+      <div class="am-card"><span class="am-dir warn">Productivity</span><h3>More dials, lower connect</h3><p>Across segments, days with more calls per agent have lower Connect% (correlation −0.7 overall, −0.78 Affiliate). Extra dials go into re-dialling the same unreachable pool. Track connects per agent (about 58 a day) rather than calls per agent as the productivity number.</p></div>
+      <div class="am-card"><span class="am-dir warn">Productivity</span><h3>Bottom Funnel wrap time is heavy</h3><p>Bottom Funnel agents spend 164 s wrapping each connected call, against 89 s in Vernac and 96 s in Affiliate: about 2.2 hours of an 8.7-hour login. Cutting it to the overall 115 s frees roughly 40 minutes per agent per day, worth about 4–5 more connects per agent at their current pace.</p></div>
+      <div class="am-card"><span class="am-dir flat">Quality</span><h3>Affiliate connects most, talks least</h3><p>Affiliate has the best Connect% (24%) but the shortest talk time (1.8 min against 2.8 in Bottom Funnel). Quick connects and short calls point to low-intent or wrong-number leads. Worth checking against Affiliate CVR on the tracker.</p></div>
+      <div class="am-card"><span class="am-dir flat">Staffing</span><h3>Sundays run 20% lighter</h3><p>Sundays average 207 agents against 252–267 on other days, and undialled leads jump (15% on Sun 8 Nov, 22% in Top Funnel). 7 Nov looks like a dialer or system outage: logins were normal but calls per agent fell 60% and idle rose to 44% in every segment.</p></div>
+    </div>
+  </section>
+
+  <details class="am-notes">
+    <summary>How the numbers are built, and gaps in the report</summary>
+    <ul>
+      <li>Agent times are hours per agent. Ready time = login − not-ready. True utilisation = (talk + dial) ÷ ready time, and idle rate = idle ÷ ready time; both match the report's own columns. Connects per agent = calls per agent × Connect%.</li>
+      <li>Lead dialling uses the hourly tabs: lead counts by creation hour, business date, status (open or closed) and dial status. Leads created after 9 pm count in the next business date.</li>
+      <li>The latest day's undialled share reads high until that day's leads have been worked.</li>
+      <li>Segment agents add up to about 85% of Overall, so about 15% of agents sit outside these five segments.</li>
+      <li>Wrap time per connected call on 30 Oct (37 s, against about 115 s) looks like a reporting error in every segment.</li>
+      <li>What would sharpen this: call dispositions (interested, callback, not eligible), time from lead creation to first dial, the reason a lead closed without a dial, and a lead ID to join with the sales dump for CVR by segment.</li>
+    </ul>
+  </details>
+
+  </section>
 </div>
 
 <script>
@@ -512,7 +588,7 @@ dash.calc('cream_period', {
 <script>
 (function () {
   const show = (tab) => {
-    if (!['overview', 'daily', 'cream', 'prospecting'].includes(tab)) tab = 'overview';
+    if (!['overview', 'daily', 'cream', 'prospecting', 'callcentre'].includes(tab)) tab = 'overview';
     window.amState.tab = tab;
     document.querySelectorAll('.am-panel').forEach((p) => { p.hidden = p.id !== tab; });
     document.querySelectorAll('.am-tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
@@ -524,7 +600,7 @@ dash.calc('cream_period', {
     if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({block: 'start'});
   }));
   const h = (location.hash || '').replace('#', '');
-  if (['daily', 'cream', 'overview', 'prospecting'].includes(h)) show(h);
+  if (['daily', 'cream', 'overview', 'prospecting', 'callcentre'].includes(h)) show(h);
 })();
 </script>
 
@@ -1251,6 +1327,191 @@ dash.calc('cream_period', {
 })();
 </script>
 
+<style>
+.cc-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:760px){.cc-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cc-kpis .am-kpi-val{font-size:clamp(22px,4.6vw,30px)}
+.cc-flags{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:var(--cds-font-size-body);line-height:1.45}
+.cc-flags li{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:baseline}
+.cc-flags .am-dir{text-align:center}
+@media (max-width:520px){.cc-flags li{grid-template-columns:96px minmax(0,1fr)}.cc-flags .am-dir{font-size:11px;padding:3px 6px}}
+.cc-find{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--cds-gap-md)}
+.cc-find h3{font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium);margin:10px 0 6px}
+.cc-find p{margin:0;font-size:var(--cds-font-size-caption);line-height:1.55;color:var(--color-fg)}
+.am-select{font:inherit;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);padding:6px 10px;border-radius:999px}
+.am-mx tr.cc-total td{font-weight:var(--cds-font-weight-medium);background:color-mix(in srgb,var(--color-fg) 4%,var(--color-panel))}
+#callcentre .am-tip{white-space:normal;min-width:150px}
+</style>
+<script>
+window.ccInit = function () {
+  const D = dash.data('cc_daily').data, H = dash.data('cc_hourly').data;
+  const SEGS = ['Overall', 'Top Funnel', 'SEM Core', 'Vernac', 'Bottom Funnel', 'Affiliate'];
+  const inr = new Intl.NumberFormat('en-IN', {maximumFractionDigits: 0});
+  const F = {
+    pct: (v, d = 1) => (v == null || isNaN(v) ? '—' : (v * 100).toFixed(d) + '%'),
+    num: (v) => (v == null || isNaN(v) ? '—' : inr.format(v)),
+    one: (v) => (v == null || isNaN(v) ? '—' : v.toFixed(1)),
+    sec: (v) => (v == null || isNaN(v) ? '—' : Math.round(v) + ' s'),
+    min: (v) => (v == null || isNaN(v) ? '—' : v.toFixed(1) + ' min')
+  };
+  const fd = (s) => d3.utcFormat('%a %-d %b')(new Date(s + 'T00:00:00Z'));
+  // lead-side metrics per seg x business date
+  const L = new Map();
+  for (const r of H) { const k = r.seg + '|' + r.bdate; const o = L.get(k) || {leads: 0, ond: 0, cnd: 0, ond_eve: 0, eve: 0}; o.leads += r.leads; o.ond += r.ond; o.cnd += r.cnd; if (r.hour === 19 || r.hour === 20) { o.eve += r.leads; o.ond_eve += r.ond; } L.set(k, o); }
+  const rows = D.map((r) => { const l = L.get(r.seg + '|' + r.date); const o = Object.assign({}, r);
+    if (l) { o.leads = l.leads; o.ond = l.ond; o.cnd = l.cnd; o.und_pct = l.ond / l.leads; o.cnd_pct = l.cnd / l.leads; o.lpa = l.leads / r.agents; o.ond_eve = l.ond_eve; o.eve = l.eve; }
+    return o; });
+  const by = (seg) => rows.filter((r) => r.seg === seg).sort((a, b) => (a.date < b.date ? -1 : 1));
+  const dates = Array.from(new Set(rows.map((r) => r.date))).sort();
+  const base = (seg, date, k) => { const v = by(seg).filter((r) => r.date < date).slice(-7).map((r) => r[k]).filter((x) => x != null && !isNaN(x)); return v.length >= 3 ? d3.median(v) : null; };
+  const get = (seg, date) => rows.find((r) => r.seg === seg && r.date === date);
+
+  // metric definitions: label, fmt, better ('up'|'down'|null), threshold for colouring (relative or abs pts)
+  const M = {
+    agents: {l: 'Agents', f: F.num, better: 'up', rel: 0.1},
+    leads: {l: 'Leads', f: F.num, better: null},
+    lpa: {l: 'Leads / agent', f: F.one, better: null},
+    calls_pa: {l: 'Calls / agent', f: F.num, better: 'up', rel: 0.15},
+    connect: {l: 'Connect%', f: (v) => F.pct(v), better: 'up', abs: 0.01},
+    conn_pa: {l: 'Connects / agent', f: F.one, better: 'up', rel: 0.1},
+    util: {l: 'True utilisation', f: (v) => F.pct(v, 0), better: 'up', abs: 0.04},
+    idle_rate: {l: 'Idle rate', f: (v) => F.pct(v, 0), better: 'down', abs: 0.04},
+    att_min: {l: 'Avg talk time', f: F.min, better: null, rel: 0.2},
+    wrap_conn_s: {l: 'Wrap / connect', f: F.sec, better: 'down', rel: 0.2},
+    und_pct: {l: 'Undialled %', f: (v) => F.pct(v), better: 'down', abs: 0.02},
+    cnd_pct: {l: 'Closed, no dial', f: (v) => F.pct(v), better: 'down', abs: 0.03}
+  };
+  const tone = (k, v, b) => { const m = M[k]; if (!m || !m.better || v == null || b == null) return ''; const diff = v - b; const big = m.abs != null ? Math.abs(diff) >= m.abs : Math.abs(diff) >= m.rel * Math.abs(b); if (!big) return ''; return (m.better === 'up') === (diff > 0) ? 'ok' : 'bad'; };
+  const chg = (k, v, b) => { const m = M[k]; if (v == null || b == null) return ''; if (m.abs != null) { const p = (v - b) * 100; return (p > 0 ? '+' : '') + p.toFixed(1) + ' pts'; } const r = b ? v / b - 1 : null; return r == null ? '' : (r > 0 ? '+' : '') + (r * 100).toFixed(0) + '%'; };
+
+  const sel = document.getElementById('cc-day');
+  // default: latest day with hourly data
+  for (const d of dates.slice().reverse()) sel.append(new Option(fd(d), d));
+  const state = {day: dates[dates.length - 1], leak: 'Overall', tr: 'Overall', m: 'connect'};
+  sel.value = state.day;
+
+  function flags() {
+    const ul = document.getElementById('cc-flags'); ul.replaceChildren(); const out = [];
+    for (const seg of SEGS) {
+      const r = get(seg, state.day); if (!r) continue; const b = (k) => base(seg, state.day, k);
+      const loginOk = b('login') && r.login >= 0.9 * b('login');
+      const ov = get('Overall', state.day), ovb = (k) => base('Overall', state.day, k);
+      const sysDay = ov && ovb('calls_pa') && ov.calls_pa < 0.7 * ovb('calls_pa');
+      const sys = b('calls_pa') && r.calls_pa < 0.7 * b('calls_pa') && loginOk && b('idle_rate') != null && r.idle_rate > b('idle_rate') + 0.08;
+      if (sys)
+        out.push(['down', 'System', `${seg}: logins normal but calls per agent ${F.num(r.calls_pa)} vs ${F.num(b('calls_pa'))} and idle ${F.pct(r.idle_rate, 0)}. Looks like a dialer or system issue, not staffing.`]);
+      if (b('agents') && r.agents < 0.85 * b('agents')) out.push(['down', 'Staffing', `${seg}: ${r.agents} agents vs ${Math.round(b('agents'))} usual (${chg('agents', r.agents, b('agents'))}).`]);
+      if (r.und_pct != null && r.und_pct >= 0.05) out.push(['down', 'Undialled', `${seg}: ${F.num(r.ond)} leads (${F.pct(r.und_pct)}) still open and never dialled${r.ond_eve ? `, ${F.num(r.ond_eve)} of them from 7–9 pm` : ''}.`]);
+      if (r.cnd_pct != null && r.cnd_pct >= 0.15) out.push(['warn', 'Closed, no dial', `${seg}: ${F.pct(r.cnd_pct)} of leads closed without a single dial (${F.num(r.cnd)}).`]);
+      if (r.idle_rate >= 0.25 && !sys && !sysDay) out.push(['warn', 'Idle', `${seg}: idle rate ${F.pct(r.idle_rate, 0)}${r.lpa ? ` on ${F.one(r.lpa)} leads per agent` : ''}. More agents than leads.`]);
+      if (b('connect') != null && r.connect <= b('connect') - 0.015 && !sysDay) out.push(['down', 'Connect', `${seg}: Connect% ${F.pct(r.connect)} vs ${F.pct(b('connect'))} usual.`]);
+      if (b('connect') != null && r.connect >= b('connect') + 0.02 && seg === 'Overall') out.push(['up', 'Connect', `${seg}: Connect% ${F.pct(r.connect)} vs ${F.pct(b('connect'))} usual.`]);
+      if (b('wrap_conn_s') && r.wrap_conn_s >= 1.3 * b('wrap_conn_s') && !sys && !sysDay) out.push(['warn', 'Wrap', `${seg}: wrap ${F.sec(r.wrap_conn_s)} per connected call vs ${F.sec(b('wrap_conn_s'))} usual.`]);
+    }
+    if (!out.length) out.push(['flat', 'All clear', 'No segment crossed a threshold against its last 7 days.']);
+    for (const [t, tag, txt] of out) { const li = document.createElement('li'); const s = document.createElement('span'); s.className = 'am-dir ' + t; s.textContent = tag; const p = document.createElement('span'); p.textContent = txt; li.append(s, p); ul.append(li); }
+  }
+
+  function kpis() {
+    const el = document.getElementById('cc-kpis'); el.replaceChildren(); const r = get('Overall', state.day);
+    for (const k of ['agents', 'lpa', 'conn_pa', 'connect', 'util', 'idle_rate', 'und_pct', 'cnd_pct']) {
+      const b = base('Overall', state.day, k), v = r ? r[k] : null;
+      const c = document.createElement('div'); c.className = 'am-card am-kpi';
+      const l = document.createElement('div'); l.className = 'am-kpi-label'; l.textContent = M[k].l;
+      const val = document.createElement('div'); val.className = 'am-kpi-val'; val.textContent = M[k].f(v);
+      const meta = document.createElement('div'); meta.className = 'am-kpi-meta';
+      if (b != null && v != null) { const p = document.createElement('span'); const t = tone(k, v, b); p.className = 'am-dir ' + (t === 'ok' ? 'up' : t === 'bad' ? 'down' : 'flat'); p.textContent = chg(k, v, b) || '0'; meta.append(p, document.createTextNode(' 7-day ' + M[k].f(b))); }
+      c.append(l, val, meta); el.append(c);
+    }
+  }
+
+  function segTable() {
+    const el = document.getElementById('cc-seg-table');
+    const cols = ['agents', 'leads', 'lpa', 'calls_pa', 'connect', 'conn_pa', 'util', 'idle_rate', 'att_min', 'wrap_conn_s', 'und_pct', 'cnd_pct'];
+    const t = document.createElement('table'); t.className = 'am-mx';
+    const th = document.createElement('thead'), hr = document.createElement('tr');
+    const h0 = document.createElement('th'); h0.className = 'am-stick'; h0.textContent = 'Segment'; hr.append(h0);
+    for (const k of cols) { const h = document.createElement('th'); h.textContent = M[k].l; hr.append(h); }
+    th.append(hr); t.append(th); const tb = document.createElement('tbody');
+    for (const seg of SEGS) { const r = get(seg, state.day); if (!r) continue; const tr = document.createElement('tr'); if (seg === 'Overall') tr.className = 'cc-total';
+      const c0 = document.createElement('td'); c0.className = 'am-stick'; c0.textContent = seg; tr.append(c0);
+      for (const k of cols) { const td = document.createElement('td'); const v = r[k], b = base(seg, state.day, k); td.textContent = M[k].f(v); const tn = tone(k, v, b); if (tn) td.className = 'am-c-' + tn; if (b != null) td.title = '7-day median ' + M[k].f(b); tr.append(td); }
+      tb.append(tr); }
+    t.append(tb); el.replaceChildren(t);
+  }
+
+  function chips(id, key, redraw) {
+    const el = document.getElementById(id); el.replaceChildren();
+    for (const s of SEGS) { const b = document.createElement('button'); b.className = 'am-chip'; b.textContent = s; b.setAttribute('aria-pressed', String(state[key] === s));
+      b.onclick = () => { state[key] = s; chips(id, key, redraw); redraw(); }; el.append(b); }
+  }
+
+  function tip(el) { const t = document.createElement('div'); t.className = 'am-tip'; el.append(t); return t; }
+  function showTip(t, x, W, lines) { t.replaceChildren(); const b = document.createElement('b'); b.textContent = lines[0]; t.append(b); for (const l of lines.slice(1)) { const s = document.createElement('span'); s.textContent = l; t.append(s, document.createElement('br')); } t.style.opacity = 1; t.style.left = Math.max(80, Math.min(x, W - 80)) + 'px'; t.style.top = '40px'; }
+
+  function leak() {
+    const el = document.getElementById('cc-leak-chart'); el.replaceChildren();
+    const hrs = d3.range(24).map((h) => { const v = H.filter((r) => r.seg === state.leak && r.bdate === state.day && r.hour === h); const leads = d3.sum(v, (r) => r.leads), ond = d3.sum(v, (r) => r.ond), cnd = d3.sum(v, (r) => r.cnd); return {h, leads, ond, cnd, dl: leads - ond - cnd}; });
+    const tot = d3.sum(hrs, (d) => d.leads), ond = d3.sum(hrs, (d) => d.ond), eve = hrs.filter((d) => d.h === 19 || d.h === 20), eveOnd = d3.sum(eve, (d) => d.ond);
+    document.getElementById('cc-leak-sub').textContent = tot ? `${fd(state.day)}, ${state.leak}: ${F.num(tot)} leads, ${F.num(ond)} still open and never dialled (${F.pct(ond / tot)}). ${F.num(eveOnd)} of those came in between 7 and 9 pm. Leads from 9 pm on count in the next day.` : 'No hourly lead data for this day (the hourly tabs start on 1 Nov).';
+    if (!tot) return;
+    const W = el.clientWidth || 700, Hh = 240, m = {t: 10, r: 8, b: 26, l: 40};
+    const svg = d3.select(el).append('svg').attr('width', W).attr('height', Hh).attr('role', 'img').attr('aria-label', 'Leads by creation hour, dialled vs never dialled');
+    const x = d3.scaleBand().domain(d3.range(24)).range([m.l, W - m.r]).padding(0.15), y = d3.scaleLinear().domain([0, d3.max(hrs, (d) => d.leads)]).nice().range([Hh - m.b, m.t]);
+    svg.append('rect').attr('x', x(19) - 2).attr('width', x(21) - x(19) + 1).attr('y', m.t).attr('height', Hh - m.t - m.b).style('fill', 'color-mix(in srgb,var(--color-bad) 8%,transparent)');
+    const ya = svg.append('g').attr('transform', `translate(${m.l - 4},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(F.num)); ya.select('.domain').remove();
+    svg.insert('g', ':first-child').selectAll('line').data(y.ticks(4)).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y).attr('y2', y).style('stroke', 'var(--cds-chart-grid)');
+    const xa = svg.append('g').attr('transform', `translate(0,${Hh - m.b})`).call(d3.axisBottom(x).tickValues(d3.range(0, 24, W < 500 ? 3 : 1)).tickSize(0).tickFormat((h) => (h < 10 ? '0' : '') + h)); xa.select('.domain').remove();
+    for (const d of hrs) { let y0 = y(0); for (const [k, c] of [['dl', 'var(--am-accent)'], ['cnd', '#c9c4b8'], ['ond', 'var(--color-bad)']]) { const hgt = y(0) - y(d[k]); svg.append('rect').attr('x', x(d.h)).attr('width', x.bandwidth()).attr('y', y0 - hgt).attr('height', Math.max(0, hgt)).style('fill', c); y0 -= hgt; } }
+    svg.selectAll('.tick text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+    const t = tip(el);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', Hh - m.t - m.b).attr('fill', 'transparent').on('pointermove pointerdown', (ev) => {
+      const px = d3.pointer(ev, svg.node())[0]; const i = Math.max(0, Math.min(23, Math.floor((px - m.l) / x.step()))); const d = hrs[i];
+      showTip(t, x(i), W, [`${String(i).padStart(2, '0')}:00–${String(i).padStart(2, '0')}:59 · ${F.num(d.leads)} leads`, `Dialled ${F.num(d.dl)}`, `Closed, never dialled ${F.num(d.cnd)}`, `Open, never dialled ${F.num(d.ond)} (${F.pct(d.leads ? d.ond / d.leads : null)})`]); })
+      .on('pointerleave', () => { t.style.opacity = 0; });
+  }
+
+  function trend() {
+    const el = document.getElementById('cc-tr-chart'); el.replaceChildren();
+    const k = state.m, seg = state.tr; const pts = by(seg).filter((r) => r[k] != null && !isNaN(r[k])).map((r) => ({x: new Date(r.date + 'T00:00:00Z'), y: r[k], d: r.date}));
+    const W = el.clientWidth || 700, Hh = 240, m = {t: 12, r: 12, b: 24, l: 48};
+    const svg = d3.select(el).append('svg').attr('width', W).attr('height', Hh).attr('role', 'img').attr('aria-label', M[k].l + ' by day, ' + seg);
+    const lo = d3.min(pts, (p) => p.y), hi = d3.max(pts, (p) => p.y);
+    const y = d3.scaleLinear().domain([Math.min(0, lo), hi * 1.08]).nice().range([Hh - m.b, m.t]), x = d3.scaleUtc().domain(d3.extent(pts, (p) => p.x)).range([m.l, W - m.r]);
+    svg.append('g').selectAll('line').data(y.ticks(4)).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y).attr('y2', y).style('stroke', 'var(--cds-chart-grid)');
+    const ya = svg.append('g').attr('transform', `translate(${m.l - 4},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(M[k].f)); ya.select('.domain').remove();
+    const xa = svg.append('g').attr('transform', `translate(0,${Hh - m.b})`).call(d3.axisBottom(x).ticks(Math.max(3, Math.floor(W / 90))).tickSize(0).tickFormat(d3.utcFormat('%-d %b'))); xa.select('.domain').remove();
+    svg.selectAll('.tick text').style('fill', 'var(--cds-text-secondary)').style('font-size', '11px');
+    svg.append('path').datum(pts).attr('fill', 'none').style('stroke', 'var(--am-accent)').attr('stroke-width', 2).attr('d', d3.line().x((p) => x(p.x)).y((p) => y(p.y)));
+    svg.selectAll('circle').data(pts).join('circle').attr('r', (p) => (p.d === state.day ? 4.5 : 2.5)).attr('cx', (p) => x(p.x)).attr('cy', (p) => y(p.y)).style('fill', (p) => (p.d === state.day ? 'var(--color-fg)' : 'var(--am-accent)'));
+    const t = tip(el);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', Hh - m.t - m.b).attr('fill', 'transparent').on('pointermove pointerdown', (ev) => {
+      const tx = x.invert(d3.pointer(ev, svg.node())[0]); const p = pts.reduce((a, b) => (Math.abs(b.x - tx) < Math.abs(a.x - tx) ? b : a)); showTip(t, x(p.x), W, [fd(p.d), M[k].l + ': ' + M[k].f(p.y)]); })
+      .on('pointerleave', () => { t.style.opacity = 0; });
+  }
+
+  document.querySelectorAll('#cc-tr-metric button').forEach((b) => (b.onclick = () => { state.m = b.dataset.m; document.querySelectorAll('#cc-tr-metric button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); trend(); }));
+  sel.onchange = () => { state.day = sel.value; all(); };
+  function all() { flags(); kpis(); segTable(); leak(); trend(); }
+  chips('cc-leak-seg', 'leak', leak); chips('cc-tr-seg', 'tr', trend);
+  all();
+  window.ccRedraw = () => { leak(); trend(); };
+};
+
+(function () {
+  let done = false, lastW = 0;
+  dash.draw('cc-root', (el) => {
+    const d = dash.data('cc_daily'), h = dash.data('cc_hourly');
+    if (d.status !== 'ok' || h.status !== 'ok' || !d.data || !h.data) return;
+    const w = document.getElementById('callcentre').clientWidth;
+    if (!done) { done = true; lastW = w; window.ccInit(); }
+    else if (w !== lastW) { lastW = w; window.ccRedraw(); }
+  });
+  dash.draw('cc-asof', (el) => { const m = dash.data('cc_meta'); if (m.status !== 'ok' || !m.data) { el.textContent = window.__ccError ? 'Call centre data failed to load' : '—'; return; }
+    const f = (s) => d3.utcFormat('%-d %b')(new Date(s + 'T00:00:00Z'));
+    el.textContent = `From the Call Centre report · agent productivity ${f(m.data.daily_from)}–${f(m.data.daily_to)} · lead dialling by creation hour ${f(m.data.hourly_from)}–${f(m.data.hourly_to)}`; });
+})();
+</script>
 <script>
 window.__amDataP = fetch('data.json', {cache: 'no-store'})
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -1263,6 +1524,13 @@ Promise.all([
   window.__amDataP.catch(function () {})
 ]).then(function (res) { window.__amLoad(res[0]); })
   .catch(function (e) { window.__prError = String(e); dash.draw('pr-camps'); });
+</script>
+<script>
+Promise.all([
+  fetch('callcentre.json', {cache: 'no-store'}).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }),
+  window.__amDataP.catch(function () {})
+]).then(function (res) { window.__amLoad(res[0]); })
+  .catch(function (e) { window.__ccError = String(e); dash.draw('cc-asof'); });
 </script>
 </body>
 </html>

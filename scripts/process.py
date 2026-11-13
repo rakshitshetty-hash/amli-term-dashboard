@@ -70,6 +70,11 @@ def load_mapping(path):
     return lead_map, sale_map, st, drr2short
 
 
+def load_benchmark():
+    p = Path(__file__).resolve().parent.parent / 'config' / 'cream_benchmark.json'
+    return json.loads(p.read_text()) if p.exists() else []
+
+
 def load_overrides():
     p = Path(__file__).resolve().parent.parent / 'config' / 'overrides.json'
     return json.loads(p.read_text()) if p.exists() else {}
@@ -248,7 +253,8 @@ def main():
     unmapped = sorted(set(L.loc[L.li == 'Unmapped', 'Source Code (VSM)'].astype(str)) | set(S.loc[S.li == 'Unmapped', 'Source Code (VSM)'].astype(str)))
     out = dict(meta=dict(as_of=last.strftime('%Y-%m-%d'), generated_at=datetime.now(timezone.utc).isoformat(timespec='seconds'),
                          unmapped_source_codes=unmapped),
-               targets_vs_actuals=summary, daily_performance=daily, daily_targets=targets, cream_leads=cream)
+               targets_vs_actuals=summary, daily_performance=daily, daily_targets=targets, cream_leads=cream,
+               cream_benchmark=load_benchmark())
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(out, separators=(',', ':')))
     print(f'as_of {last.date()} · leads {len(L)} · sales {len(S)} · spend {SP.spend.sum():,.0f} · unmapped {unmapped}')

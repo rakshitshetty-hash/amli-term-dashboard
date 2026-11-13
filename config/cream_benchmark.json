@@ -1,0 +1,102 @@
+[
+ {
+  "line_item": "SEO",
+  "month": "2026-08",
+  "month_leads": 29018,
+  "month_share": 0.2931,
+  "best_share": 0.3586,
+  "best_date": "2026-08-03",
+  "best_day_leads": 1054,
+  "days_left_out": 0
+ },
+ {
+  "line_item": "Brand",
+  "month": "2026-08",
+  "month_leads": 34198,
+  "month_share": 0.2933,
+  "best_share": 0.3277,
+  "best_date": "2026-08-02",
+  "best_day_leads": 1373,
+  "days_left_out": 0
+ },
+ {
+  "line_item": "Core",
+  "month": "2026-08",
+  "month_leads": 26256,
+  "month_share": 0.2756,
+  "best_share": 0.3145,
+  "best_date": "2026-08-17",
+  "best_day_leads": 763,
+  "days_left_out": 0
+ },
+ {
+  "line_item": "Others",
+  "month": "2026-08",
+  "month_leads": 1630,
+  "month_share": 0.2301,
+  "best_share": 0.3148,
+  "best_date": "2026-08-19",
+  "best_day_leads": 54,
+  "days_left_out": 12
+ },
+ {
+  "line_item": "PR",
+  "month": "2026-08",
+  "month_leads": 109000,
+  "month_share": 0.1369,
+  "best_share": 0.1614,
+  "best_date": "2026-08-25",
+  "best_day_leads": 3066,
+  "days_left_out": 0
+ },
+ {
+  "line_item": "RM",
+  "month": "2026-08",
+  "month_leads": 4381,
+  "month_share": 0.1648,
+  "best_share": 0.2519,
+  "best_date": "2026-08-02",
+  "best_day_leads": 135,
+  "days_left_out": 0
+ },
+ {
+  "line_item": "New Affiliate",
+  "month": "2026-08",
+  "month_leads": 144687,
+  "month_share": 0.1105,
+  "best_share": 0.1395,
+  "best_date": "2026-08-17",
+  "best_day_leads": 4532,
+  "days_left_out": 1
+ },
+ {
+  "line_item": "Amazon",
+  "month": "2026-08",
+  "month_leads": 207,
+  "month_share": 0.1353,
+  "best_share": 0.15,
+  "best_date": "2026-08-01",
+  "best_day_leads": 80,
+  "days_left_out": 18
+ },
+ {
+  "line_item": "Netcore",
+  "month": "2026-08",
+  "month_leads": 29994,
+  "month_share": 0.178,
+  "best_share": 0.2257,
+  "best_date": "2026-08-09",
+  "best_day_leads": 855,
+  "days_left_out": 1
+ },
+ {
+  "line_item": "All channels",
+  "month": "2026-08",
+  "month_leads": 411498,
+  "month_share": 0.1682,
+  "best_share": 0.1935,
+  "best_date": "2026-08-01",
+  "best_day_leads": 13036,
+  "days_left_out": 0
+ }
+]

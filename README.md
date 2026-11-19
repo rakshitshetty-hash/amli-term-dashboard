@@ -70,6 +70,6 @@ Framework preset: Other. Build command: none. Output directory: `public` (set in
 
 A separate client-facing page, `public/creatives/index.html`, counting creatives received each month from the "Term - HM (Int)" tab of the "Creative Repository Dashboard - AMLI x HM" sheet: Static (Branded / Non-Branded HM AI) and Video (Annual Deal Influencers / Non-Annual Deal Influencers / Nano / Branded). Months follow the sheet's Month column.
 
-- **Live:** `apps-script/creatives/Code.gs` is a Google Apps Script web app that reads the sheet and returns counts only (no ad names or links). Deploy it (Execute as: Me, Who has access: Anyone) and paste the `/exec` URL into `API_URL` in `public/creatives/index.html`. The Refresh button then re-reads the sheet each time.
-- **Snapshot:** while `API_URL` is empty, the page reads `public/creatives.json` (October and November 2026, as of 19 Nov).
+- **Sync:** `apps-script/creatives/Code.gs` runs as a Google Apps Script under a HiveMinds login (public web apps are blocked on the Workspace). `syncToGitHub` reads the sheet and commits counts only (no ad names or links) to `public/creatives.json` when they change and at least once a day; `setupSchedule` runs it every 15 minutes. It needs a GitHub fine-grained token (this repo, Contents: read and write) saved as the `GITHUB_TOKEN` script property. Each commit redeploys Vercel.
+- The page reads `public/creatives.json`; Refresh reloads it. `API_URL` in the page stays empty unless the script is ever published as a public web app.
 - Classification rules (annual-deal list, Nano face types, HM AI tag) sit at the top of `Code.gs`.

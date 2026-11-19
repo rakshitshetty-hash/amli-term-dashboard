@@ -4,8 +4,8 @@
  * Reads the "Term - HM (Int)" tab of "Creative Repository Dashboard - AMLI x HM"
  * and returns ONLY aggregated counts (no ad names, scripts or links leave the sheet).
  *
- * Deploy: Deploy > New deployment > Web app
- *   Execute as: Me   |   Who has access: Anyone
+ * Setup: add GITHUB_TOKEN in Project Settings > Script properties, run syncToGitHub once,
+ * then run setupSchedule once. The dashboard reads public/creatives.json.
  */
 
 const SHEET_ID = '1-CN2Aits9NzmOOY032SRjVQX_qfm62a2_L8KlA9bzVo';
@@ -25,16 +25,70 @@ const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov
 const MONTH_NAMES = ['January','February','March','April','May','June','July',
                      'August','September','October','November','December'];
 
-function doGet() {
+// ---- GitHub sync (the dashboard reads public/creatives.json from this repo) ----
+const GH_REPO = 'rakshitshetty-hash/amli-term-dashboard';
+const GH_PATH = 'public/creatives.json';
+const GH_BRANCH = 'main';
+const SYNC_EVERY_MINUTES = 15;
+
+/** Reads the sheet and pushes counts to GitHub when they change (and once a day). */
+function syncToGitHub() {
+  const token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
+  if (!token) throw new Error('Add GITHUB_TOKEN under Project Settings > Script properties');
+  const data = buildData_();
+  const today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+  const url = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_PATH;
+  const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
+
+  let sha = null, old = null;
+  const cur = UrlFetchApp.fetch(url + '?ref=' + GH_BRANCH, { headers: headers, muteHttpExceptions: true });
+  if (cur.getResponseCode() === 200) {
+    const j = JSON.parse(cur.getContentText());
+    sha = j.sha;
+    try {
+      old = JSON.parse(Utilities.newBlob(Utilities.base64Decode(j.content.replace(/\n/g, ''))).getDataAsString());
+    } catch (e) { old = null; }
+  }
+  if (old && old.syncDate === today && JSON.stringify(old.months) === JSON.stringify(data.months)) {
+    Logger.log('No change since last sync');
+    return;
+  }
+  data.syncDate = today;
+  const body = {
+    message: 'Update creatives received counts',
+    content: Utilities.base64Encode(JSON.stringify(data, null, 1), Utilities.Charset.UTF_8),
+    branch: GH_BRANCH
+  };
+  if (sha) body.sha = sha;
+  const res = UrlFetchApp.fetch(url, { method: 'put', headers: headers, contentType: 'application/json',
+                                       payload: JSON.stringify(body), muteHttpExceptions: true });
+  if (res.getResponseCode() >= 300) throw new Error('GitHub ' + res.getResponseCode() + ': ' + res.getContentText());
+  Logger.log('Pushed: ' + JSON.stringify(data.months.map(function (m) { return m.key; })));
+}
+
+/** Run once: schedules syncToGitHub every SYNC_EVERY_MINUTES minutes. */
+function setupSchedule() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'syncToGitHub') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('syncToGitHub').timeBased().everyMinutes(SYNC_EVERY_MINUTES).create();
+  Logger.log('Scheduled every ' + SYNC_EVERY_MINUTES + ' minutes');
+}
+
+function buildData_() {
   const sheet = findTab_(SpreadsheetApp.openById(SHEET_ID));
   const lastRow = sheet.getLastRow();
   const rows = lastRow >= FIRST_DATA_ROW
     ? sheet.getRange(FIRST_DATA_ROW, 1, lastRow - FIRST_DATA_ROW + 1, 15).getDisplayValues()
     : [];
-
   const result = aggregate_(rows);
   result.generatedAt = new Date().toISOString();
-  return ContentService.createTextOutput(JSON.stringify(result))
+  return result;
+}
+
+/** Optional: same counts as JSON if the script is ever published as a web app. */
+function doGet() {
+  return ContentService.createTextOutput(JSON.stringify(buildData_()))
     .setMimeType(ContentService.MimeType.JSON);
 }
 

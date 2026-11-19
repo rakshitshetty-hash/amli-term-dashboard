@@ -98,7 +98,7 @@
     </div>
   </section>
 
-  <footer>Counts are creatives logged in the AMLI × HiveMinds creative repository for the selected month. The current month shows everything received up to the refresh date. Numbers update twice a day, around 6 am and 6 pm IST.</footer>
+  <footer>Counts are creatives logged in the AMLI × HiveMinds creative repository for the selected month. The current month shows everything received up to the last sync. The tracker syncs twice a day, around 6 am and 6 pm IST; Refresh loads the latest sync.</footer>
 </div>
 
 <script>
@@ -161,8 +161,8 @@ function render(){
   const isCurrent = key === currentKey(gen);
   const s = sum(c, STATIC_ROWS), v = sum(c, VIDEO_ROWS);
   $('stamp').innerHTML = isCurrent
-    ? `${m.label} · <b>updated till ${fmtDate(gen)}</b> · last refreshed ${fmtTime(gen)} IST`
-    : `${m.label} · full month · last refreshed ${fmtDate(gen)}, ${fmtTime(gen)} IST`;
+    ? `${m.label} · <b>updated till ${fmtDate(gen)}</b> · data last synced from the tracker at ${fmtTime(gen)} IST`
+    : `${m.label} · full month · data last synced ${fmtDate(gen)}, ${fmtTime(gen)} IST`;
   $('t-total').textContent = s + v; $('t-static').textContent = s; $('t-video').textContent = v;
   $('s-sum').textContent = s; $('v-sum').textContent = v;
   $('s-rows').innerHTML = rowsHTML(c, STATIC_ROWS);

@@ -65,3 +65,11 @@ Replace `config/plan.xlsx` with the new month's media plan. It must keep the "FI
 ## Vercel settings
 
 Framework preset: Other. Build command: none. Output directory: `public` (set in `vercel.json`).
+
+## Creatives received page (`/creatives`)
+
+A separate client-facing page, `public/creatives/index.html`, counting creatives received each month from the "Term - HM (Int)" tab of the "Creative Repository Dashboard - AMLI x HM" sheet: Static (Branded / Non-Branded HM AI) and Video (Annual Deal Influencers / Non-Annual Deal Influencers / Nano / Branded). Months follow the sheet's Month column.
+
+- **Live:** `apps-script/creatives/Code.gs` is a Google Apps Script web app that reads the sheet and returns counts only (no ad names or links). Deploy it (Execute as: Me, Who has access: Anyone) and paste the `/exec` URL into `API_URL` in `public/creatives/index.html`. The Refresh button then re-reads the sheet each time.
+- **Snapshot:** while `API_URL` is empty, the page reads `public/creatives.json` (October and November 2026, as of 19 Nov).
+- Classification rules (annual-deal list, Nano face types, HM AI tag) sit at the top of `Code.gs`.

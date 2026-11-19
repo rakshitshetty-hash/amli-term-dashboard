@@ -3,6 +3,15 @@
   "outputDirectory": "public",
   "headers": [
     {
+      "source": "/creatives.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
       "source": "/data.json",
       "headers": [
         {

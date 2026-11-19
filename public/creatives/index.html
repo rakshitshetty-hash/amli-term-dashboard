@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creatives Received — Axis Max Life Term</title>
+<style>
+  :root{
+    --ink:#1c1f24; --muted:#6b7079; --line:#e4e2dc; --bg:#f7f6f2; --card:#ffffff;
+    --brand:#97144d; --brand-soft:#f3e3ea; --video:#1f5f8b; --video-soft:#e2edf5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.45 "Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 48px}
+  header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;
+         border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:24px}
+  .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+  h1{font-size:26px;margin:0;font-weight:650;letter-spacing:-.01em}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  select,button{font:inherit;font-size:14px;border:1px solid var(--ink);background:var(--card);
+                color:var(--ink);padding:7px 12px;border-radius:4px;cursor:pointer}
+  button{background:var(--ink);color:#fff}
+  button:disabled{opacity:.55;cursor:wait}
+  .stamp{font-size:13px;color:var(--muted);margin:-12px 0 22px}
+  .stamp b{color:var(--ink);font-weight:600}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+  .tile .k{font-size:13px;color:var(--muted)}
+  .tile .v{font-size:36px;font-weight:650;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+  .tile.static{border-top:4px solid var(--brand)} .tile.video{border-top:4px solid var(--video)}
+  .tile.total{border-top:4px solid var(--ink)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px}
+  .panel h2{font-size:15px;margin:0 0 14px;display:flex;justify-content:space-between}
+  .panel h2 span{color:var(--muted);font-weight:500}
+  .row{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;margin:10px 0}
+  .row .lbl{font-size:14px}
+  .bar{height:8px;background:#efeee9;border-radius:4px;margin-top:5px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:4px}
+  .static .bar i{background:var(--brand)} .video .bar i{background:var(--video)}
+  .row .n{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+  th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  th.grp-s{color:var(--brand)} th.grp-v{color:var(--video)}
+  tr.sel td{background:#fbfaf6;font-weight:600}
+  td.tot{font-weight:650}
+  .scroll{overflow-x:auto}
+  .msg{padding:14px 16px;border-radius:6px;background:#fff4e5;border:1px solid #f0d3a6;margin-bottom:20px;display:none}
+  footer{margin-top:28px;font-size:12px;color:var(--muted)}
+  @media (max-width:680px){
+    .tiles{grid-template-columns:1fr 1fr 1fr;gap:8px}.tile{padding:12px}.tile .v{font-size:26px}
+    .grid{grid-template-columns:1fr} h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">Axis Max Life × HiveMinds · Term</p>
+      <h1>Creatives Received</h1>
+    </div>
+    <div class="controls">
+      <select id="month" aria-label="Month"></select>
+      <button id="refresh">Refresh</button>
+    </div>
+  </header>
+  <p class="stamp" id="stamp">Loading…</p>
+  <div class="msg" id="msg"></div>
+
+  <section class="tiles">
+    <div class="tile total"><div class="k">Total received</div><div class="v" id="t-total">–</div></div>
+    <div class="tile static"><div class="k">Static</div><div class="v" id="t-static">–</div></div>
+    <div class="tile video"><div class="k">Video</div><div class="v" id="t-video">–</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel static"><h2>Static <span id="s-sum"></span></h2><div id="s-rows"></div></div>
+    <div class="panel video"><h2>Video <span id="v-sum"></span></h2><div id="v-rows"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Month on month</h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Month</th>
+            <th class="grp-s">Static<br>Branded</th><th class="grp-s">Static<br>Non-Branded</th>
+            <th class="grp-v">Annual Deal<br>Influencers</th><th class="grp-v">Non-Annual<br>Influencers</th>
+            <th class="grp-v">Nano</th><th class="grp-v">Video<br>Branded</th>
+            <th>Static</th><th>Video</th><th>Total</th></tr>
+        </thead>
+        <tbody id="mom"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Counts are creatives logged in the AMLI × HiveMinds creative repository for the selected month. The current month shows everything received up to the refresh date.</footer>
+</div>
+
+<script>
+// Live source: the Apps Script web app URL (ends in /exec). While it's empty,
+// the page reads the snapshot in /creatives.json instead.
+const API_URL = '';
+const SNAPSHOT_URL = '/creatives.json';
+
+const STATIC_ROWS = [['staticBranded','Branded'],['staticNonBranded','Non-Branded (HM AI)']];
+const VIDEO_ROWS  = [['videoAnnual','Annual Deal Influencers'],['videoNonAnnual','Non-Annual Deal Influencers'],
+                     ['videoNano','Nano'],['videoBranded','Branded']];
+let data = null;
+const $ = id => document.getElementById(id);
+const sum = (c, keys) => keys.reduce((a,[k]) => a + (c[k]||0), 0);
+
+const fmtDate = d => d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
+const fmtTime = d => d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',timeZone:'Asia/Kolkata'});
+
+function currentKey(d){
+  const p = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit'}).formatToParts(d);
+  return p.find(x=>x.type==='year').value + '-' + p.find(x=>x.type==='month').value;
+}
+
+async function load(){
+  const btn = $('refresh'); btn.disabled = true; btn.textContent = 'Refreshing…';
+  $('msg').style.display = 'none';
+  try{
+    const demo = new URLSearchParams(location.search).has('demo');
+    if (demo) data = window.DEMO_DATA;
+    else {
+      const src = API_URL || SNAPSHOT_URL;
+      const res = await fetch(src + (src.includes('?')?'&':'?') + 't=' + Date.now(), {cache:'no-store'});
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      data = await res.json();
+    }
+    const sel = $('month'), prev = sel.value;
+    sel.innerHTML = '';
+    [...data.months].reverse().forEach(m => sel.add(new Option(m.label, m.key)));
+    const nowKey = currentKey(new Date(data.generatedAt));
+    sel.value = data.months.some(m=>m.key===prev) ? prev
+              : (data.months.some(m=>m.key===nowKey) ? nowKey : data.months[data.months.length-1].key);
+    render();
+  }catch(e){
+    $('msg').textContent = "Couldn't refresh the numbers right now. Please try again in a minute.";
+    $('msg').style.display = 'block';
+    $('stamp').textContent = '';
+  }finally{ btn.disabled = false; btn.textContent = 'Refresh'; }
+}
+
+function rowsHTML(c, defs){
+  const max = Math.max(1, ...defs.map(([k]) => c[k]||0));
+  return defs.map(([k,l]) => `<div class="row"><div><div class="lbl">${l}</div>
+    <div class="bar"><i style="width:${(c[k]||0)/max*100}%"></i></div></div><div class="n">${c[k]||0}</div></div>`).join('');
+}
+
+function render(){
+  const key = $('month').value;
+  const m = data.months.find(x => x.key === key); const c = m.counts;
+  const gen = new Date(data.generatedAt);
+  const isCurrent = key === currentKey(gen);
+  const s = sum(c, STATIC_ROWS), v = sum(c, VIDEO_ROWS);
+  $('stamp').innerHTML = isCurrent
+    ? `${m.label} · <b>updated till ${fmtDate(gen)}</b> · last refreshed ${fmtTime(gen)} IST`
+    : `${m.label} · full month · last refreshed ${fmtDate(gen)}, ${fmtTime(gen)} IST`;
+  $('t-total').textContent = s + v; $('t-static').textContent = s; $('t-video').textContent = v;
+  $('s-sum').textContent = s; $('v-sum').textContent = v;
+  $('s-rows').innerHTML = rowsHTML(c, STATIC_ROWS);
+  $('v-rows').innerHTML = rowsHTML(c, VIDEO_ROWS);
+  $('mom').innerHTML = [...data.months].reverse().map(mm => {
+    const k = mm.counts, ss = sum(k, STATIC_ROWS), vv = sum(k, VIDEO_ROWS);
+    return `<tr class="${mm.key===key?'sel':''}"><td>${mm.label}</td>
+      ${[...STATIC_ROWS, ...VIDEO_ROWS].map(([f]) => `<td>${k[f]||0}</td>`).join('')}
+      <td>${ss}</td><td>${vv}</td><td class="tot">${ss+vv}</td></tr>`;
+  }).join('');
+}
+
+$('month').addEventListener('change', render);
+$('refresh').addEventListener('click', load);
+load();
+</script>
+</body>
+</html>

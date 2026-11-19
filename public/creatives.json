@@ -1,0 +1,33 @@
+{
+ "generatedAt": "2026-11-19T14:20:00Z",
+ "months": [
+  {
+   "key": "2026-10",
+   "label": "October 2026",
+   "year": 2026,
+   "month": 10,
+   "counts": {
+    "staticBranded": 120,
+    "staticNonBranded": 24,
+    "videoAnnual": 13,
+    "videoNonAnnual": 28,
+    "videoNano": 42,
+    "videoBranded": 21
+   }
+  },
+  {
+   "key": "2026-11",
+   "label": "November 2026",
+   "year": 2026,
+   "month": 11,
+   "counts": {
+    "staticBranded": 77,
+    "staticNonBranded": 0,
+    "videoAnnual": 3,
+    "videoNonAnnual": 2,
+    "videoNano": 10,
+    "videoBranded": 18
+   }
+  }
+ ]
+}

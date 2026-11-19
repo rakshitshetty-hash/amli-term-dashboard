@@ -5,7 +5,7 @@
  * and returns ONLY aggregated counts (no ad names, scripts or links leave the sheet).
  *
  * Setup: add GITHUB_TOKEN in Project Settings > Script properties, run syncToGitHub once,
- * then run setupSchedule once. The dashboard reads public/creatives.json.
+ * then run setupSchedule once (syncs daily at 6 am and 6 pm IST). The dashboard reads public/creatives.json.
  */
 
 const SHEET_ID = '1-CN2Aits9NzmOOY032SRjVQX_qfm62a2_L8KlA9bzVo';
@@ -29,7 +29,7 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July',
 const GH_REPO = 'rakshitshetty-hash/amli-term-dashboard';
 const GH_PATH = 'public/creatives.json';
 const GH_BRANCH = 'main';
-const SYNC_EVERY_MINUTES = 15;
+const SYNC_HOURS = [6, 18];   // 6 am and 6 pm, in the project's time zone (set it to Asia/Kolkata)
 
 /** Reads the sheet and pushes counts to GitHub when they change (and once a day). */
 function syncToGitHub() {
@@ -66,13 +66,16 @@ function syncToGitHub() {
   Logger.log('Pushed: ' + JSON.stringify(data.months.map(function (m) { return m.key; })));
 }
 
-/** Run once: schedules syncToGitHub every SYNC_EVERY_MINUTES minutes. */
+/** Run once: schedules syncToGitHub daily at each hour in SYNC_HOURS (Apps Script runs it within that hour). */
 function setupSchedule() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
     if (t.getHandlerFunction() === 'syncToGitHub') ScriptApp.deleteTrigger(t);
   });
-  ScriptApp.newTrigger('syncToGitHub').timeBased().everyMinutes(SYNC_EVERY_MINUTES).create();
-  Logger.log('Scheduled every ' + SYNC_EVERY_MINUTES + ' minutes');
+  SYNC_HOURS.forEach(function (h) {
+    ScriptApp.newTrigger('syncToGitHub').timeBased().everyDays(1).atHour(h).nearMinute(0)
+      .inTimezone('Asia/Kolkata').create();
+  });
+  Logger.log('Scheduled daily at ' + SYNC_HOURS.join(':00 and ') + ':00 IST');
 }
 
 function buildData_() {

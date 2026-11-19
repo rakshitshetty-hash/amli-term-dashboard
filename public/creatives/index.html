@@ -65,7 +65,6 @@
     </div>
     <div class="controls">
       <select id="month" aria-label="Month"></select>
-      <button id="refresh">Refresh</button>
     </div>
   </header>
   <p class="stamp" id="stamp">Loading…</p>
@@ -98,7 +97,7 @@
     </div>
   </section>
 
-  <footer>Counts are creatives logged in the AMLI × HiveMinds creative repository for the selected month. The current month shows everything received up to the last sync. The tracker syncs twice a day, around 6 am and 6 pm IST; Refresh loads the latest sync.</footer>
+  <footer>Counts are creatives logged in the AMLI × HiveMinds creative repository for the selected month. The current month shows everything received up to the last sync. Numbers update automatically twice a day, around 6 am and 6 pm IST.</footer>
 </div>
 
 <script>
@@ -123,7 +122,6 @@ function currentKey(d){
 }
 
 async function load(){
-  const btn = $('refresh'); btn.disabled = true; btn.textContent = 'Refreshing…';
   $('msg').style.display = 'none';
   try{
     const demo = new URLSearchParams(location.search).has('demo');
@@ -142,10 +140,10 @@ async function load(){
               : (data.months.some(m=>m.key===nowKey) ? nowKey : data.months[data.months.length-1].key);
     render();
   }catch(e){
-    $('msg').textContent = "Couldn't refresh the numbers right now. Please try again in a minute.";
+    $('msg').textContent = "Couldn't load the numbers right now. Please reload the page in a minute.";
     $('msg').style.display = 'block';
     $('stamp').textContent = '';
-  }finally{ btn.disabled = false; btn.textContent = 'Refresh'; }
+  }
 }
 
 function rowsHTML(c, defs){
@@ -176,8 +174,9 @@ function render(){
 }
 
 $('month').addEventListener('change', render);
-$('refresh').addEventListener('click', load);
 load();
+// If the page is left open, pick up the next sync without a manual reload.
+setInterval(load, 30 * 60 * 1000);
 </script>
 </body>
 </html>

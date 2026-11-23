@@ -119,14 +119,14 @@
    "month": 11,
    "counts": {
     "staticBranded": 110,
-    "staticNonBranded": 10,
+    "staticNonBranded": 14,
     "videoAnnual": 3,
-    "videoNonAnnual": 2,
+    "videoNonAnnual": 3,
     "videoNano": 14,
     "videoBranded": 25
    }
   }
  ],
- "generatedAt": "2026-11-23T08:46:08.964Z",
+ "generatedAt": "2026-11-23T12:35:39.143Z",
  "syncDate": "2026-11-23"
 }

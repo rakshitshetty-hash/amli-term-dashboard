@@ -118,7 +118,7 @@
    "year": 2026,
    "month": 11,
    "counts": {
-    "staticBranded": 110,
+    "staticBranded": 111,
     "staticNonBranded": 15,
     "videoAnnual": 3,
     "videoNonAnnual": 3,
@@ -127,6 +127,6 @@
    }
   }
  ],
- "generatedAt": "2026-11-24T00:32:25.434Z",
- "syncDate": "2026-11-24"
+ "generatedAt": "2026-11-25T00:32:35.430Z",
+ "syncDate": "2026-11-25"
 }

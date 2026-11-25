@@ -120,13 +120,13 @@
    "counts": {
     "staticBranded": 111,
     "staticNonBranded": 15,
-    "videoAnnual": 3,
+    "videoAnnual": 4,
     "videoNonAnnual": 3,
-    "videoNano": 14,
+    "videoNano": 15,
     "videoBranded": 25
    }
   }
  ],
- "generatedAt": "2026-11-25T00:32:35.430Z",
+ "generatedAt": "2026-11-25T12:35:38.375Z",
  "syncDate": "2026-11-25"
 }
